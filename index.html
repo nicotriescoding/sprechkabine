@@ -56,6 +56,35 @@
   .pegel i { display: block; height: 100%; width: 0; background: var(--hopfen); }
   .klein { color: var(--staub); font-size: 13px; flex-basis: 100%; }
   .bauen { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; padding: 12px 10px 0; }
+  .reiter { display: flex; gap: 8px; margin: 4px 0 8px; }
+  .reiter button { flex: 1; font: 24px/1 var(--anzeige); padding: 12px; border-radius: 10px; border: 1px solid var(--kante);
+                   background: transparent; color: var(--staub); cursor: pointer; }
+  .reiter button.an { background: var(--tresen); border-color: var(--bier); color: var(--bier); }
+  .themen { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-top: 12px; }
+  .thema { text-align: left; font: 700 17px/1.25 var(--text); color: var(--kreide); background: var(--tresen); border: 1px solid var(--kante);
+           border-radius: 12px; padding: 14px; cursor: pointer; display: flex; flex-direction: column; gap: 8px; min-height: 96px; }
+  .thema .zahl { font: 20px/1 var(--anzeige); color: var(--staub); margin-top: auto; }
+  .thema .zahl b { color: var(--hopfen); font-weight: 400; }
+  .zurueck { background: none; border: 0; color: var(--staub); font: 16px var(--text); padding: 8px 0; cursor: pointer; }
+  .thema-kopf h2 { font: 34px/1.05 var(--anzeige); margin: 4px 0 10px; color: var(--bier); }
+  .info { background: var(--tresen); border-left: 4px solid var(--bier); border-radius: 8px; padding: 12px 14px; font-size: 16px; }
+  details.tipps { margin: 12px 0; }
+  details.tipps summary { cursor: pointer; color: var(--staub); padding: 6px 0; }
+  .tipp { display: block; width: 100%; text-align: left; font: 16px/1.35 var(--text); color: var(--kreide); background: none;
+          border: 1px dashed var(--kante); border-radius: 8px; padding: 10px 12px; margin-top: 6px; cursor: pointer; }
+  .tipp.an { border-style: solid; border-color: var(--bier); }
+  .vorlesen { font-size: 26px; line-height: 1.3; font-weight: 700; margin: 12px 0 4px; }
+  .wer { display: flex; gap: 8px; align-items: center; margin: 12px 0; }
+  .wer input { flex: 1; min-width: 0; font: 17px var(--text); padding: 12px; border-radius: 10px; border: 1px solid var(--kante);
+               background: var(--tresen); color: var(--kreide); }
+  .aufnahme-zone { position: sticky; bottom: 0; background: var(--holz); padding: 10px 0 max(10px, env(safe-area-inset-bottom));
+                   display: flex; flex-wrap: wrap; gap: 8px; border-top: 1px solid var(--kante); margin-top: 8px; z-index: 2; }
+  .aufnahme-zone .knopf.rec { font-size: 22px; padding: 22px; flex-basis: 100%; }
+  .takes h3 { font: 24px/1 var(--anzeige); margin: 22px 0 6px; color: var(--staub); }
+  .take { padding: 10px 0; border-bottom: 1px solid var(--kante); display: flex; flex-direction: column; gap: 6px; }
+  .take .meta { color: var(--staub); font-size: 13px; }
+  .take audio { width: 100%; }
+  .ok-meldung { color: var(--hopfen); font-size: 15px; flex-basis: 100%; }
   @keyframes puls { 50% { opacity: .55; } }
 </style>
 </head>
@@ -63,9 +92,11 @@
 <main>
   <div class="kopf">
     <h1>Sprechkabine</h1>
+    <div class="reiter"><button data-reiter="themen">Themen</button><button data-reiter="videos">Videos</button></div>
     <div class="oben" id="oben">Lade…</div>
-    <p>Satz antippen, „Aufnehmen“, Satz ablesen, „Stopp“. Anhören und behalten. Sind alle Sätze da, „Video bauen“.</p>
+    <p id="hilfe"></p>
   </div>
+  <div id="themen"></div>
   <div id="liste"></div>
 </main>
 <script>
@@ -79,6 +110,9 @@ let K = new URLSearchParams(location.hash.slice(1)).get("k");
 try { if (K) localStorage.setItem("kabine_k", K); else K = localStorage.getItem("kabine_k"); } catch (e) {}
 if (location.hash) history.replaceState(null, "", location.pathname);
 
+let tippsAuf = false, reiter = "themen", themen = [], takes = {}, thema = null, tipp = null, zuletzt = "";
+try { reiter = localStorage.getItem("kabine_reiter") || "themen"; thema = localStorage.getItem("kabine_thema"); } catch (e) {}
+let WER = ""; try { WER = localStorage.getItem("kabine_wer") || ""; } catch (e) {}
 let folgen = [], aufnahmen = {}, auftraege = {}, aktiv = null, probe = null, beschaeftigt = "";
 let rec = null, stream = null, stuecke = [], pegelTimer = null;
 const mime = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm"].find(m => window.MediaRecorder && MediaRecorder.isTypeSupported(m)) || "";
@@ -93,21 +127,29 @@ function statusVon(f, s) {
 const fertig = f => f.saetze.length > 0 && f.saetze.every(s => statusVon(f, s) === "ok");
 
 async function laden() {
-  if (!K) { document.getElementById("oben").textContent = "Link ohne Schlüssel"; document.getElementById("liste").innerHTML = '<p class="box fehler">Bitte den Link aus dem Projekt öffnen, der Schlüssel fehlt.</p>'; return; }
+  if (!K) { document.getElementById("oben").textContent = "Link ohne Schlüssel"; document.getElementById("themen").innerHTML = document.getElementById("liste").innerHTML = '<p class="box fehler">Bitte den Link aus dem Projekt öffnen, der Schlüssel fehlt.</p>'; return; }
   try {
     const r = await fetch(`${API}?k=${encodeURIComponent(K)}`);
     const d = await r.json();
     if (!r.ok) throw new Error(d.fehler || r.status);
-    folgen = d.folgen; aufnahmen = {}; auftraege = {};
-    d.aufnahmen.forEach(a => aufnahmen[a.folge + "|" + a.satz] = a);
+    themen = d.folgen.filter(f => f.art === "thema").sort((a, b) => (a.rang ?? 0) - (b.rang ?? 0));
+    const tIds = new Set(themen.map(t => t.id));
+    folgen = d.folgen.filter(f => f.art !== "thema"); aufnahmen = {}; auftraege = {}; takes = {};
+    d.aufnahmen.forEach(a => tIds.has(a.folge) ? (takes[a.folge] ||= []).push(a) : aufnahmen[a.folge + "|" + a.satz] = a);
+    Object.values(takes).forEach(l => l.sort((a, b) => String(b.at).localeCompare(String(a.at))));
     d.auftraege.forEach(a => auftraege[a.folge] = a);
     zeichnen();
   } catch (e) {
-    document.getElementById("liste").innerHTML = `<p class="box fehler">Konnte die Folgen nicht laden: ${esc(e.message)}. Internet an?</p>`;
+    document.getElementById("themen").innerHTML = document.getElementById("liste").innerHTML = `<p class="box fehler">Konnte die Folgen nicht laden: ${esc(e.message)}. Internet an?</p>`;
   }
 }
 
 function zeichnen() {
+  document.querySelectorAll("[data-reiter]").forEach(b => b.classList.toggle("an", b.dataset.reiter === reiter));
+  document.getElementById("themen").hidden = reiter !== "themen";
+  document.getElementById("liste").hidden = reiter !== "videos";
+  if (reiter === "themen") return themenZeichnen();
+  document.getElementById("hilfe").textContent = "Satz antippen, „Aufnehmen“, Satz ablesen, „Stopp“. Anhören und behalten. Sind alle Sätze da, „Video bauen“.";
   const offen = folgen.reduce((n, f) => n + f.saetze.filter(s => statusVon(f, s) !== "ok").length, 0);
   document.getElementById("oben").textContent = folgen.length ? (offen ? `${offen} Sätze offen` : "Alles eingesprochen. Prost!") : "Noch keine Folge";
   folgen.sort((a, b) => fertig(a) - fertig(b) || a.id.localeCompare(b.id));
@@ -173,10 +215,10 @@ async function start() {
       const p = document.getElementById("pegel"); if (p) { p.style.width = Math.min(100, max / 1.28) + "%"; p.style.background = max > 120 ? "var(--neon)" : "var(--hopfen)"; }
     }, 60);
   }
-  verwerfen(); stuecke = [];
+  verwerfen(); stuecke = []; zuletzt = "";
   rec = new MediaRecorder(stream, mime ? { mimeType: mime } : {});
   rec.ondataavailable = e => e.data.size && stuecke.push(e.data);
-  rec.onstop = () => { const blob = new Blob(stuecke, { type: rec.mimeType || mime }); probe = { blob, url: URL.createObjectURL(blob) }; zeichnen(); };
+  rec.onstop = () => { const blob = new Blob(stuecke, { type: rec.mimeType || mime }); if (reiter === "themen") return takeSpeichern(blob); probe = { blob, url: URL.createObjectURL(blob) }; zeichnen(); };
   rec.start(); zeichnen();
 }
 
@@ -203,9 +245,70 @@ async function bauen(folge) {
   } catch (e) { fehler("Bestellen hat nicht geklappt: " + e.message); }
 }
 
+// ---------- Themen: beliebig viele Aufnahmen pro Thema ----------
+const zeit = t => { try { return new Date(t).toLocaleString("de-DE", { weekday: "short", hour: "2-digit", minute: "2-digit" }); } catch (e) { return ""; } };
+const tonUrl = (folge, a) => `${API}?k=${encodeURIComponent(K)}&aktion=ton&folge=${encodeURIComponent(folge)}&satz=${encodeURIComponent(a.satz)}&t=${encodeURIComponent(a.at)}`;
+const werVon = a => String(a.hash || "").startsWith("wer:") ? a.hash.slice(4) : "";
+
+function themenZeichnen() {
+  const el = document.getElementById("themen"), t = themen.find(x => x.id === thema);
+  const gesamt = themen.reduce((n, x) => n + (takes[x.id] || []).length, 0);
+  if (!t) {
+    document.getElementById("oben").textContent = themen.length ? `${gesamt} Aufnahme${gesamt === 1 ? "" : "n"} bisher` : "Noch keine Themen";
+    document.getElementById("hilfe").textContent = "Thema antippen und so viele Sprüche einsprechen, wie euch einfallen. Die besten suchen wir später aus.";
+    el.innerHTML = `<div class="themen">${themen.map(x => { const n = (takes[x.id] || []).length;
+      return `<button class="thema" data-thema="${esc(x.id)}">${esc(x.titel)}<span class="zahl">${n ? `<b>${n}</b> Aufnahme${n === 1 ? "" : "n"}` : "noch leer"}</span></button>`; }).join("")}</div>`;
+    return;
+  }
+  const liste = takes[t.id] || [], laeuft = rec && rec.state === "recording", tipps = t.saetze || [];
+  document.getElementById("oben").textContent = `${liste.length} Aufnahme${liste.length === 1 ? "" : "n"} in diesem Thema`;
+  document.getElementById("hilfe").textContent = "";
+  el.innerHTML = `<div class="thema-kopf"><button class="zurueck" data-zurueck>← Alle Themen</button><h2>${esc(t.titel)}</h2></div>
+    ${t.info ? `<div class="info">${esc(t.info)}</div>` : ""}
+    ${tipps.length ? `<details class="tipps" ${tippsAuf ? "open" : ""}><summary>Vorschläge zum Anfangen (${tipps.length})</summary>
+      ${tipps.map(v => `<button class="tipp ${tipp === v.id ? "an" : ""}" data-tipp="${esc(v.id)}">${esc(v.text)}</button>`).join("")}</details>` : ""}
+    <label class="wer"><span class="klein" style="flex:0 0 auto">Wer spricht?</span><input id="wer" maxlength="30" placeholder="Name (optional)" value="${esc(WER)}"></label>
+    <div class="aufnahme-zone">
+      ${tipp ? `<div class="vorlesen" style="flex-basis:100%">${esc((tipps.find(v => v.id === tipp) || {}).text || "")}</div>` : ""}
+      <button class="knopf rec ${laeuft ? "laeuft" : ""}" data-rec ${beschaeftigt ? "disabled" : ""}>${beschaeftigt || (laeuft ? "■ Stopp und speichern" : "● Aufnehmen")}</button>
+      ${laeuft ? '<span class="pegel"><i id="pegel"></i></span>' : ""}
+      ${zuletzt && !laeuft && !beschaeftigt ? `<span class="ok-meldung">${esc(zuletzt)}</span>` : ""}
+    </div>
+    <div class="takes"><h3>Aufnahmen (${liste.length})</h3>
+      ${liste.length ? liste.map((a, i) => `<div class="take"><span class="meta">#${liste.length - i} · ${esc(werVon(a) || "ohne Name")} · ${esc(zeit(a.at))}</span>
+        <audio controls preload="none" src="${tonUrl(t.id, a)}"></audio></div>`).join("") : '<p class="klein">Noch nichts aufgenommen. Einfach loslegen.</p>'}</div>`;
+}
+
+function themaWaehlen(id) {
+  if (rec && rec.state === "recording") return;
+  thema = id; tipp = null; zuletzt = ""; tippsAuf = false;
+  try { id ? localStorage.setItem("kabine_thema", id) : localStorage.removeItem("kabine_thema"); } catch (e) {}
+  zeichnen(); window.scrollTo(0, 0);
+}
+
+async function takeSpeichern(blob) {
+  const folge = thema, satz = "n" + Date.now().toString(36);
+  const typ = (blob.type || "audio/webm").split(";")[0], endung = typ.includes("mp4") ? "m4a" : "webm";
+  const wer = WER.trim().slice(0, 30), hashWert = wer ? "wer:" + wer : "";
+  beschaeftigt = "Speichere…"; zeichnen();
+  for (let versuch = 0; versuch < 3; versuch++) {
+    try {
+      const r = await fetch(`${API}?k=${encodeURIComponent(K)}&aktion=aufnahme&folge=${encodeURIComponent(folge)}&satz=${satz}&hash=${encodeURIComponent(hashWert)}&endung=${endung}`,
+                            { method: "POST", headers: { "Content-Type": typ }, body: blob });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.fehler || r.status);
+      (takes[folge] ||= []).unshift({ folge, satz, hash: hashWert, typ, at: new Date().toISOString() });
+      beschaeftigt = ""; zuletzt = "✓ Gespeichert. Nächster Spruch?"; zeichnen(); return;
+    } catch (e) {
+      if (versuch === 2) { beschaeftigt = ""; zeichnen(); fehler("Speichern hat nicht geklappt: " + e.message + ". Internet an? Bitte nochmal aufnehmen."); }
+      else await new Promise(r => setTimeout(r, 1500));
+    }
+  }
+}
+
 function fehler(t) {
   const p = document.createElement("p"); p.className = "box fehler"; p.textContent = t;
-  (document.querySelector(".satz.aktiv .steuer") || document.querySelector(".kopf")).append(p);
+  (document.querySelector(reiter === "themen" ? ".aufnahme-zone" : ".satz.aktiv .steuer") || document.querySelector(".kopf")).append(p);
   setTimeout(() => p.remove(), 9000);
 }
 
@@ -214,12 +317,23 @@ document.addEventListener("click", e => {
   if (t.closest("[data-rec]")) return rec && rec.state === "recording" ? rec.stop() : start();
   if (t.closest("[data-behalten]")) return behalten();
   if (t.closest("[data-nochmal]")) { verwerfen(); return start(); }
+  const rt = t.closest("[data-reiter]");
+  if (rt) { if (rec && rec.state === "recording") return; reiter = rt.dataset.reiter; try { localStorage.setItem("kabine_reiter", reiter); } catch (e) {} verwerfen(); aktiv = null; return zeichnen(); }
+  const th = t.closest("[data-thema]"); if (th) return themaWaehlen(th.dataset.thema);
+  if (t.closest("[data-zurueck]")) return themaWaehlen(null);
+  const tp = t.closest("[data-tipp]"); if (tp) { tipp = tipp === tp.dataset.tipp ? null : tp.dataset.tipp; return zeichnen(); }
   const b = t.closest("[data-bauen]"); if (b) return bauen(b.dataset.bauen);
   if (t.closest("audio, button, a")) return;
   const s = t.closest("[data-satz]");
   if (s && !s.classList.contains("aktiv")) { const [f, id] = s.dataset.satz.split("|"); waehlen(f, id); }
 });
+document.addEventListener("toggle", e => { if (e.target.matches?.("details.tipps")) tippsAuf = e.target.open; }, true);
+document.addEventListener("input", e => {
+  if (e.target.id === "wer") { WER = e.target.value; try { localStorage.setItem("kabine_wer", WER); } catch (er) {} }
+});
 document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT") return;
+  if (reiter === "themen" && thema && e.code === "Space") { e.preventDefault(); if (!beschaeftigt) rec && rec.state === "recording" ? rec.stop() : start(); return; }
   if (!aktiv) return;
   if (e.code === "Space") { e.preventDefault(); rec && rec.state === "recording" ? rec.stop() : !probe && start(); }
   if (e.code === "Enter" && probe) { e.preventDefault(); behalten(); }
