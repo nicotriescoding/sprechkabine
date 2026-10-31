@@ -84,6 +84,9 @@
   .take { padding: 10px 0; border-bottom: 1px solid var(--kante); display: flex; flex-direction: column; gap: 6px; }
   .take .meta { color: var(--staub); font-size: 13px; }
   .take audio { width: 100%; }
+  .thema.neu { border-style: dashed; color: var(--bier); background: transparent; }
+  .neu-form { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; padding: 14px; border: 1px solid var(--bier); border-radius: 12px; background: var(--tresen); }
+  .neu-form input, .neu-form textarea { font: 17px var(--text); padding: 12px; border-radius: 10px; border: 1px solid var(--kante); background: var(--holz); color: var(--kreide); width: 100%; }
   .ok-meldung { color: var(--hopfen); font-size: 15px; flex-basis: 100%; }
   @keyframes puls { 50% { opacity: .55; } }
 </style>
@@ -110,7 +113,7 @@ let K = new URLSearchParams(location.hash.slice(1)).get("k");
 try { if (K) localStorage.setItem("kabine_k", K); else K = localStorage.getItem("kabine_k"); } catch (e) {}
 if (location.hash) history.replaceState(null, "", location.pathname);
 
-let tippsAuf = false, reiter = "themen", themen = [], takes = {}, thema = null, tipp = null, zuletzt = "";
+let neuOffen = false, tippsAuf = false, reiter = "themen", themen = [], takes = {}, thema = null, tipp = null, zuletzt = "";
 try { reiter = localStorage.getItem("kabine_reiter") || "themen"; thema = localStorage.getItem("kabine_thema"); } catch (e) {}
 let WER = ""; try { WER = localStorage.getItem("kabine_wer") || ""; } catch (e) {}
 let folgen = [], aufnahmen = {}, auftraege = {}, aktiv = null, probe = null, beschaeftigt = "";
@@ -257,7 +260,14 @@ function themenZeichnen() {
     document.getElementById("oben").textContent = themen.length ? `${gesamt} Aufnahme${gesamt === 1 ? "" : "n"} bisher` : "Noch keine Themen";
     document.getElementById("hilfe").textContent = "Thema antippen und so viele Sprüche einsprechen, wie euch einfallen. Die besten suchen wir später aus.";
     el.innerHTML = `<div class="themen">${themen.map(x => { const n = (takes[x.id] || []).length;
-      return `<button class="thema" data-thema="${esc(x.id)}">${esc(x.titel)}<span class="zahl">${n ? `<b>${n}</b> Aufnahme${n === 1 ? "" : "n"}` : "noch leer"}</span></button>`; }).join("")}</div>`;
+      return `<button class="thema" data-thema="${esc(x.id)}">${esc(x.titel)}<span class="zahl">${n ? `<b>${n}</b> Aufnahme${n === 1 ? "" : "n"}` : "noch leer"}</span></button>`; }).join("")}
+      <button class="thema neu" data-neu>+ Eigenes Thema<span class="zahl">anlegen</span></button></div>
+      ${neuOffen ? `<form class="neu-form" id="neu-form">
+        <input id="neu-titel" maxlength="80" placeholder="Titel, z. B. Worst drunk texts" required>
+        <textarea id="neu-info" maxlength="400" rows="3" placeholder="Worum geht es? (optional)"></textarea>
+        <div style="display:flex;gap:8px"><button class="knopf gut" type="submit" ${beschaeftigt ? "disabled" : ""}>${beschaeftigt || "Thema anlegen"}</button>
+        <button class="knopf" type="button" data-neu-weg>Abbrechen</button></div></form>` : ""}`;
+    if (neuOffen) setTimeout(() => document.getElementById("neu-titel")?.focus(), 0);
     return;
   }
   const liste = takes[t.id] || [], laeuft = rec && rec.state === "recording", tipps = t.saetze || [];
@@ -306,9 +316,22 @@ async function takeSpeichern(blob) {
   }
 }
 
+async function themaAnlegen() {
+  const titel = document.getElementById("neu-titel").value.trim(), info = document.getElementById("neu-info").value.trim();
+  if (titel.length < 2) return;
+  beschaeftigt = "Lege an…"; zeichnen();
+  try {
+    const r = await fetch(`${API}?k=${encodeURIComponent(K)}&aktion=thema&titel=${encodeURIComponent(titel)}&info=${encodeURIComponent(info)}`, { method: "POST" });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.fehler || r.status);
+    themen.push(d.thema); themen.sort((a, b) => (a.rang ?? 0) - (b.rang ?? 0));
+    beschaeftigt = ""; neuOffen = false; themaWaehlen(d.thema.id);
+  } catch (e) { beschaeftigt = ""; zeichnen(); fehler("Thema anlegen hat nicht geklappt: " + e.message); }
+}
+
 function fehler(t) {
   const p = document.createElement("p"); p.className = "box fehler"; p.textContent = t;
-  (document.querySelector(reiter === "themen" ? ".aufnahme-zone" : ".satz.aktiv .steuer") || document.querySelector(".kopf")).append(p);
+  (document.querySelector(reiter === "themen" ? ".aufnahme-zone, .neu-form" : ".satz.aktiv .steuer") || document.querySelector(".kopf")).append(p);
   setTimeout(() => p.remove(), 9000);
 }
 
@@ -321,6 +344,8 @@ document.addEventListener("click", e => {
   if (rt) { if (rec && rec.state === "recording") return; reiter = rt.dataset.reiter; try { localStorage.setItem("kabine_reiter", reiter); } catch (e) {} verwerfen(); aktiv = null; return zeichnen(); }
   const th = t.closest("[data-thema]"); if (th) return themaWaehlen(th.dataset.thema);
   if (t.closest("[data-zurueck]")) return themaWaehlen(null);
+  if (t.closest("[data-neu]")) { neuOffen = true; return zeichnen(); }
+  if (t.closest("[data-neu-weg]")) { neuOffen = false; return zeichnen(); }
   const tp = t.closest("[data-tipp]"); if (tp) { tipp = tipp === tp.dataset.tipp ? null : tp.dataset.tipp; return zeichnen(); }
   const b = t.closest("[data-bauen]"); if (b) return bauen(b.dataset.bauen);
   if (t.closest("audio, button, a")) return;
@@ -328,17 +353,18 @@ document.addEventListener("click", e => {
   if (s && !s.classList.contains("aktiv")) { const [f, id] = s.dataset.satz.split("|"); waehlen(f, id); }
 });
 document.addEventListener("toggle", e => { if (e.target.matches?.("details.tipps")) tippsAuf = e.target.open; }, true);
+document.addEventListener("submit", e => { if (e.target.id === "neu-form") { e.preventDefault(); themaAnlegen(); } });
 document.addEventListener("input", e => {
   if (e.target.id === "wer") { WER = e.target.value; try { localStorage.setItem("kabine_wer", WER); } catch (er) {} }
 });
 document.addEventListener("keydown", e => {
-  if (e.target.tagName === "INPUT") return;
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
   if (reiter === "themen" && thema && e.code === "Space") { e.preventDefault(); if (!beschaeftigt) rec && rec.state === "recording" ? rec.stop() : start(); return; }
   if (!aktiv) return;
   if (e.code === "Space") { e.preventDefault(); rec && rec.state === "recording" ? rec.stop() : !probe && start(); }
   if (e.code === "Enter" && probe) { e.preventDefault(); behalten(); }
 });
-document.addEventListener("visibilitychange", () => { if (!document.hidden && !(rec && rec.state === "recording") && !probe) laden(); });
+document.addEventListener("visibilitychange", () => { if (!document.hidden && !(rec && rec.state === "recording") && !probe && !neuOffen && !beschaeftigt) laden(); });
 laden();
 </script>
 </body>
