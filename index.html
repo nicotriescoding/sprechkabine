@@ -41,6 +41,8 @@
   .text { font-size: 18px; }
   .satz.aktiv .text { font-size: 27px; line-height: 1.3; font-weight: 700; }
   .bild { color: var(--staub); font-size: 13px; }
+  .sprech { color: var(--bier); font-size: 15px; line-height: 1.35; }
+  .satz:not(.aktiv) .sprech { display: none; }
   .chip { align-self: flex-start; font-size: 12px; padding: 1px 9px; border-radius: 99px; border: 1px solid; }
   .chip.fehlt { color: var(--neon); } .chip.neu { color: var(--bier); } .chip.ok { color: var(--hopfen); }
   .steuer { grid-column: 1 / 3; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
@@ -190,6 +192,7 @@ function satzHtml(f, s, st) {
   return `<div class="satz ${ist ? "aktiv" : ""}" data-satz="${esc(f.id)}|${esc(s.id)}">
     <span class="nr">${esc(s.id)}</span>
     <div class="inhalt"><div class="text">${esc(s.text)}</div>
+      ${s.sprech ? `<div class="sprech">🎙 ${esc(s.sprech)}</div>` : ""}
       ${s.bild ? `<div class="bild">${esc(s.name ? s.name + " · " : "")}${esc(s.bild)}</div>` : ""}
       <span class="chip ${st}">${s.vorhanden && !a && st === "ok" ? "fertig (am Mac)" : STATUS[st]}</span></div>
     ${steuer}</div>`;
