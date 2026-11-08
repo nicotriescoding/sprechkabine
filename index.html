@@ -59,7 +59,7 @@
   .klein { color: var(--staub); font-size: 13px; flex-basis: 100%; }
   .bauen { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; padding: 12px 10px 0; }
   .reiter { display: flex; gap: 8px; margin: 4px 0 8px; }
-  .reiter button { flex: 1; font: 24px/1 var(--anzeige); padding: 12px; border-radius: 10px; border: 1px solid var(--kante);
+  .reiter button { flex: 1; font: 22px/1 var(--anzeige); padding: 12px; border-radius: 10px; border: 1px solid var(--kante);
                    background: transparent; color: var(--staub); cursor: pointer; }
   .reiter button.an { background: var(--tresen); border-color: var(--bier); color: var(--bier); }
   .themen { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-top: 12px; }
@@ -90,6 +90,19 @@
   .neu-form { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; padding: 14px; border: 1px solid var(--bier); border-radius: 12px; background: var(--tresen); }
   .neu-form input, .neu-form textarea { font: 17px var(--text); padding: 12px; border-radius: 10px; border: 1px solid var(--kante); background: var(--holz); color: var(--kreide); width: 100%; }
   .ok-meldung { color: var(--hopfen); font-size: 15px; flex-basis: 100%; }
+  .notiz-zeile { display: flex; flex-direction: column; gap: 2px; margin-top: 6px; }
+  .notiz-feld { width: 100%; font: 16px/1.4 var(--text); padding: 10px 12px; border-radius: 10px; border: 1px solid var(--kante);
+                background: var(--holz); color: var(--kreide); resize: vertical; min-height: 64px; display: block; }
+  .notiz-feld:focus { outline: none; border-color: var(--hopfen); }
+  .notiz-feld::placeholder { color: var(--staub); }
+  .notiz-status { font-size: 12px; line-height: 16px; min-height: 16px; color: var(--staub); }
+  .notiz-status.nfehler { color: var(--neon); }
+  .notiz-text { color: var(--hopfen); font-size: 14px; line-height: 1.35; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .aufnahme-zone .notiz-zeile { flex-basis: 100%; margin-top: 0; }
+  .aufnahme-zone .notiz-feld { min-height: 44px; }
+  .notiz-feld.idee-neu { font-size: 18px; min-height: 112px; }
+  .ideen-zone { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .ideen-zone .zeile { display: flex; gap: 8px; flex-wrap: wrap; }
   @keyframes puls { 50% { opacity: .55; } }
 </style>
 </head>
@@ -97,12 +110,13 @@
 <main>
   <div class="kopf">
     <h1>Sprechkabine</h1>
-    <div class="reiter"><button data-reiter="themen">Themen</button><button data-reiter="videos">Videos</button></div>
+    <div class="reiter"><button data-reiter="themen">Themen</button><button data-reiter="videos">Videos</button><button data-reiter="ideen">Ideen</button></div>
     <div class="oben" id="oben">Lade…</div>
     <p id="hilfe"></p>
   </div>
   <div id="themen"></div>
   <div id="liste"></div>
+  <div id="ideen"></div>
 </main>
 <script>
 const API = "https://opqahbmbrvtbsxnxdjvw.supabase.co/functions/v1/kabine";
@@ -119,6 +133,7 @@ let neuOffen = false, tippsAuf = false, reiter = "themen", themen = [], takes = 
 try { reiter = localStorage.getItem("kabine_reiter") || "themen"; thema = localStorage.getItem("kabine_thema"); } catch (e) {}
 let WER = ""; try { WER = localStorage.getItem("kabine_wer") || ""; } catch (e) {}
 let folgen = [], aufnahmen = {}, auftraege = {}, aktiv = null, probe = null, beschaeftigt = "";
+let ideeText = "", notizAt = {}, audioCtx = null, stoppend = false, neuZeichnen = false, notizen = {}, notizNext = "", notizDirty = new Set(), notizFlug = {}, notizTimer = {}, notizStatus = {};
 let rec = null, stream = null, stuecke = [], pegelTimer = null;
 const mime = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm"].find(m => window.MediaRecorder && MediaRecorder.isTypeSupported(m)) || "";
 
@@ -139,10 +154,13 @@ async function laden() {
     if (!r.ok) throw new Error(d.fehler || r.status);
     themen = d.folgen.filter(f => f.art === "thema").sort((a, b) => (a.rang ?? 0) - (b.rang ?? 0));
     const tIds = new Set(themen.map(t => t.id));
-    folgen = d.folgen.filter(f => f.art !== "thema"); aufnahmen = {}; auftraege = {}; takes = {};
-    d.aufnahmen.forEach(a => tIds.has(a.folge) ? (takes[a.folge] ||= []).push(a) : aufnahmen[a.folge + "|" + a.satz] = a);
+    folgen = d.folgen.filter(f => f.art !== "thema" && f.art !== "ideen"); aufnahmen = {}; auftraege = {}; takes = {};
+    d.aufnahmen.forEach(a => tIds.has(a.folge) || a.folge === "ideen" ? (takes[a.folge] ||= []).push(a) : aufnahmen[a.folge + "|" + a.satz] = a);
     Object.values(takes).forEach(l => l.sort((a, b) => String(b.at).localeCompare(String(a.at))));
     d.auftraege.forEach(a => auftraege[a.folge] = a);
+    const nz = {}, na = {}; (d.notizen || []).forEach(n => { nz[n.folge + "|" + n.satz] = n.text || ""; na[n.folge + "|" + n.satz] = n.at || ""; });
+    notizDirty.forEach(k => { nz[k] = notizen[k] ?? ""; if (notizAt[k]) na[k] = notizAt[k]; });
+    notizen = nz; notizAt = na;
     zeichnen();
   } catch (e) {
     document.getElementById("themen").innerHTML = document.getElementById("liste").innerHTML = `<p class="box fehler">Konnte die Folgen nicht laden: ${esc(e.message)}. Internet an?</p>`;
@@ -150,11 +168,54 @@ async function laden() {
 }
 
 function zeichnen() {
+  const ae = document.activeElement, fok = ae && ae.matches && ae.matches("[data-notiz]")
+    ? { k: ae.dataset.notiz, s: ae.selectionStart, e: ae.selectionEnd } : null;
+  neuZeichnen = true; try { zeichnenInnen(); } finally { neuZeichnen = false; }
+  if (!fok) return;
+  const el = [...document.querySelectorAll("[data-notiz]")].find(x => x.dataset.notiz === fok.k);
+  if (el) { el.focus({ preventScroll: true }); try { el.setSelectionRange(fok.s, fok.e); } catch (e) {} }
+}
+
+// ---------- Schnitt-Notizen ----------
+function notizFeld(key, rows, ph, klasse) {
+  const st = notizStatus[key] || {};
+  return `<div class="notiz-zeile ${klasse || ""}"><textarea class="notiz-feld" data-notiz="${esc(key)}" rows="${rows}" maxlength="2000" placeholder="${esc(ph)}">
+${esc(notizen[key])}</textarea><span class="notiz-status ${st.f ? "nfehler" : ""}" data-notiz-status="${esc(key)}">${esc(st.t || "")}</span></div>`;
+}
+function notizSetStatus(key, t, f) {
+  notizStatus[key] = { t, f: !!f };
+  document.querySelectorAll("[data-notiz-status]").forEach(x => { if (x.dataset.notizStatus === key) { x.textContent = t; x.classList.toggle("nfehler", !!f); } });
+}
+function notizPlan(key) { clearTimeout(notizTimer[key]); notizTimer[key] = setTimeout(() => notizSenden(key), 800); }
+async function notizSenden(key) {
+  clearTimeout(notizTimer[key]); delete notizTimer[key];
+  if (!notizDirty.has(key) || notizFlug[key] || !K) return;
+  const text = notizen[key] || "", i = key.indexOf("|"), folge = key.slice(0, i), satz = key.slice(i + 1);
+  notizFlug[key] = true; notizSetStatus(key, "speichere…");
+  let ok = false, msg = "";
+  for (let versuch = 0; versuch < 3 && !ok; versuch++) {
+    try {
+      const r = await fetch(`${API}?k=${encodeURIComponent(K)}&aktion=notiz&folge=${encodeURIComponent(folge)}&satz=${encodeURIComponent(satz)}`,
+                            { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify({ text: text.trim() }) });
+      const d = await r.json();
+      if (!r.ok || d.fehler) throw new Error(d.fehler || r.status);
+      ok = true;
+    } catch (e) { msg = e.message || "Fehler"; if (versuch < 2) await new Promise(r => setTimeout(r, 1200)); }
+  }
+  delete notizFlug[key];
+  if (!ok) return notizSetStatus(key, "Nicht gespeichert: " + msg, true);
+  if ((notizen[key] || "") !== text) return notizSenden(key);
+  notizDirty.delete(key); notizSetStatus(key, "gespeichert ✓");
+}
+
+function zeichnenInnen() {
   document.querySelectorAll("[data-reiter]").forEach(b => b.classList.toggle("an", b.dataset.reiter === reiter));
   document.getElementById("themen").hidden = reiter !== "themen";
   document.getElementById("liste").hidden = reiter !== "videos";
+  document.getElementById("ideen").hidden = reiter !== "ideen";
   if (reiter === "themen") return themenZeichnen();
-  document.getElementById("hilfe").textContent = "Satz antippen, „Aufnehmen“, Satz ablesen, „Stopp“. Anhören und behalten. Sind alle Sätze da, „Video bauen“.";
+  if (reiter === "ideen") return ideenZeichnen();
+  document.getElementById("hilfe").textContent = "Satz antippen, „Aufnehmen“, Satz ablesen, „Stopp“. Anhören und behalten. Sind alle Sätze da, „Video bauen“. Notiz: was soll man sehen?";
   const offen = folgen.reduce((n, f) => n + f.saetze.filter(s => statusVon(f, s) !== "ok").length, 0);
   document.getElementById("oben").textContent = folgen.length ? (offen ? `${offen} Sätze offen` : "Alles eingesprochen. Prost!") : "Noch keine Folge";
   folgen.sort((a, b) => fertig(a) - fertig(b) || a.id.localeCompare(b.id));
@@ -194,6 +255,8 @@ function satzHtml(f, s, st) {
     <div class="inhalt"><div class="text">${esc(s.text)}</div>
       ${s.sprech ? `<div class="sprech">🎙 ${esc(s.sprech)}</div>` : ""}
       ${s.bild ? `<div class="bild">${esc(s.name ? s.name + " · " : "")}${esc(s.bild)}</div>` : ""}
+      ${ist ? notizFeld(f.id + "|" + s.id, 2, "📝 Was soll man hier sehen? (Szene, Meme, Clip …)")
+        : (notizen[f.id + "|" + s.id] || "").trim() ? `<div class="notiz-text">📝 ${esc(notizen[f.id + "|" + s.id])}</div>` : ""}
       <span class="chip ${st}">${s.vorhanden && !a && st === "ok" ? "fertig (am Mac)" : STATUS[st]}</span></div>
     ${steuer}</div>`;
 }
@@ -207,13 +270,23 @@ function naechster(folge) {
   const f = folgen.find(x => x.id === folge), s = f && f.saetze.find(x => statusVon(f, x) !== "ok");
   if (s) waehlen(folge, s.id); else { aktiv = null; zeichnen(); }
 }
+function mikroZu() {
+  clearInterval(pegelTimer); pegelTimer = null;
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  stream = null;
+  if (audioCtx) { try { audioCtx.close(); } catch (e) {} audioCtx = null; }
+  try { if ("audioSession" in navigator) navigator.audioSession.type = "playback"; } catch (e) {}
+}
+function recStop() { if (rec && rec.state === "recording") { stoppend = true; rec.stop(); } }
 function verwerfen() { if (probe) URL.revokeObjectURL(probe.url); probe = null; }
 
 async function start() {
+  if (stoppend) return;
   if (!stream) {
+    try { if ("audioSession" in navigator) navigator.audioSession.type = "play-and-record"; } catch (e) {}
     try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } }); }
     catch (e) { return fehler("Kein Mikrofon-Zugriff. Bitte im Browser erlauben (Safari: aA-Menü → Website-Einstellungen → Mikrofon)."); }
-    const ctx = new (window.AudioContext || window.webkitAudioContext)(), an = ctx.createAnalyser(); an.fftSize = 512;
+    const ctx = audioCtx = new (window.AudioContext || window.webkitAudioContext)(), an = ctx.createAnalyser(); an.fftSize = 512;
     ctx.createMediaStreamSource(stream).connect(an);
     const buf = new Uint8Array(an.fftSize);
     pegelTimer = setInterval(() => {
@@ -224,7 +297,7 @@ async function start() {
   verwerfen(); stuecke = []; zuletzt = "";
   rec = new MediaRecorder(stream, mime ? { mimeType: mime } : {});
   rec.ondataavailable = e => e.data.size && stuecke.push(e.data);
-  rec.onstop = () => { const blob = new Blob(stuecke, { type: rec.mimeType || mime }); if (reiter === "themen") return takeSpeichern(blob); probe = { blob, url: URL.createObjectURL(blob) }; zeichnen(); };
+  rec.onstop = () => { stoppend = false; mikroZu(); const blob = new Blob(stuecke, { type: rec.mimeType || mime }); if (reiter === "themen" || reiter === "ideen") return takeSpeichern(blob); probe = { blob, url: URL.createObjectURL(blob) }; zeichnen(); };
   rec.start(); zeichnen();
 }
 
@@ -283,26 +356,59 @@ function themenZeichnen() {
     <label class="wer"><span class="klein" style="flex:0 0 auto">Wer spricht?</span><input id="wer" maxlength="30" placeholder="Name (optional)" value="${esc(WER)}"></label>
     <div class="aufnahme-zone">
       ${tipp ? `<div class="vorlesen" style="flex-basis:100%">${esc((tipps.find(v => v.id === tipp) || {}).text || "")}</div>` : ""}
+      <div class="notiz-zeile"><textarea class="notiz-feld" data-notiz="@next" rows="1" maxlength="2000" placeholder="📝 Notiz zur nächsten Aufnahme (optional)">
+${esc(notizNext)}</textarea></div>
       <button class="knopf rec ${laeuft ? "laeuft" : ""}" data-rec ${beschaeftigt ? "disabled" : ""}>${beschaeftigt || (laeuft ? "■ Stopp und speichern" : "● Aufnehmen")}</button>
       ${laeuft ? '<span class="pegel"><i id="pegel"></i></span>' : ""}
       ${zuletzt && !laeuft && !beschaeftigt ? `<span class="ok-meldung">${esc(zuletzt)}</span>` : ""}
     </div>
     <div class="takes"><h3>Aufnahmen (${liste.length})</h3>
       ${liste.length ? liste.map((a, i) => `<div class="take"><span class="meta">#${liste.length - i} · ${esc(werVon(a) || "ohne Name")} · ${esc(zeit(a.at))}</span>
-        <audio controls preload="none" src="${tonUrl(t.id, a)}"></audio></div>`).join("") : '<p class="klein">Noch nichts aufgenommen. Einfach loslegen.</p>'}</div>`;
+        <audio controls preload="none" src="${tonUrl(t.id, a)}"></audio>
+        ${notizFeld(t.id + "|" + a.satz, 2, "📝 Notiz zu dieser Aufnahme (Szene, Meme, Clip …)")}</div>`).join("") : '<p class="klein">Noch nichts aufgenommen. Einfach loslegen.</p>'}</div>`;
+}
+
+function ideenZeichnen() {
+  const laeuft = rec && rec.state === "recording", voice = takes.ideen || [], vSaetze = new Set(voice.map(a => a.satz));
+  const items = voice.map(a => ({ t: a.at, a }));
+  Object.keys(notizen).forEach(k => { if (k.startsWith("ideen|") && !vSaetze.has(k.slice(6))) items.push({ t: notizAt[k] || "", key: k }); });
+  items.sort((x, y) => String(y.t).localeCompare(String(x.t)));
+  document.getElementById("oben").textContent = `${items.length} Idee${items.length === 1 ? "" : "n"} gesammelt`;
+  document.getElementById("hilfe").textContent = "Videoideen, Verbesserungen, Feedback: tippen oder einsprechen.";
+  document.getElementById("ideen").innerHTML = `<div class="ideen-zone">
+    <textarea class="notiz-feld idee-neu" data-notiz="@idee" rows="4" maxlength="2000" placeholder="Idee oder Feedback…">
+${esc(ideeText)}</textarea>
+    <span class="klein">Tipp: Mikro-Taste der Handy-Tastatur zum Diktieren.</span>
+    <div class="zeile"><button class="knopf gut" data-idee-speichern>Speichern</button>
+      <button class="knopf rec ${laeuft ? "laeuft" : ""}" data-rec ${beschaeftigt ? "disabled" : ""}>${beschaeftigt || (laeuft ? "■ Stopp und speichern" : "● Sprachnotiz")}</button>
+      ${laeuft ? '<span class="pegel"><i id="pegel"></i></span>' : ""}
+      ${zuletzt && !laeuft && !beschaeftigt ? `<span class="ok-meldung">${esc(zuletzt)}</span>` : ""}</div></div>
+    <div class="takes"><h3>Ideen (${items.length})</h3>
+    ${items.length ? items.map(i => i.a
+      ? `<div class="take"><span class="meta">🎙 Sprachnotiz · ${esc(werVon(i.a) || "ohne Name")} · ${esc(zeit(i.a.at))}</span>
+          <audio controls preload="none" src="${tonUrl("ideen", i.a)}"></audio>
+          ${notizFeld("ideen|" + i.a.satz, 2, "📝 Notiz zur Sprachnotiz")}</div>`
+      : `<div class="take"><span class="meta">Idee · ${esc(zeit(i.t))}</span>${notizFeld(i.key, 3, "Idee oder Feedback…")}</div>`).join("") : '<p class="klein">Noch nichts gesammelt.</p>'}</div>`;
+}
+
+function ideeSpeichern() {
+  const text = ideeText.trim(); if (!text) return;
+  const key = "ideen|i" + Date.now().toString(36);
+  notizen[key] = text; notizAt[key] = new Date().toISOString(); notizDirty.add(key); ideeText = "";
+  zeichnen(); notizSenden(key);
 }
 
 function themaWaehlen(id) {
   if (rec && rec.state === "recording") return;
-  thema = id; tipp = null; zuletzt = ""; tippsAuf = false;
+  thema = id; tipp = null; zuletzt = ""; tippsAuf = false; notizNext = "";
   try { id ? localStorage.setItem("kabine_thema", id) : localStorage.removeItem("kabine_thema"); } catch (e) {}
   zeichnen(); window.scrollTo(0, 0);
 }
 
 async function takeSpeichern(blob) {
-  const folge = thema, satz = "n" + Date.now().toString(36);
+  const folge = reiter === "ideen" ? "ideen" : thema, satz = "n" + Date.now().toString(36);
   const typ = (blob.type || "audio/webm").split(";")[0], endung = typ.includes("mp4") ? "m4a" : "webm";
-  const wer = WER.trim().slice(0, 30), hashWert = wer ? "wer:" + wer : "";
+  const nz = folge === "ideen" ? "" : notizNext.trim().slice(0, 2000), wer = WER.trim().slice(0, 30), hashWert = wer ? "wer:" + wer : "";
   beschaeftigt = "Speichere…"; zeichnen();
   for (let versuch = 0; versuch < 3; versuch++) {
     try {
@@ -311,6 +417,11 @@ async function takeSpeichern(blob) {
       const d = await r.json();
       if (!r.ok) throw new Error(d.fehler || r.status);
       (takes[folge] ||= []).unshift({ folge, satz, hash: hashWert, typ, at: new Date().toISOString() });
+      if (nz) {
+        const k = folge + "|" + satz; notizen[k] = nz; notizDirty.add(k);
+        if (notizNext.trim() === nz) notizNext = "";
+        notizSenden(k);
+      }
       beschaeftigt = ""; zuletzt = "✓ Gespeichert. Nächster Spruch?"; zeichnen(); return;
     } catch (e) {
       if (versuch === 2) { beschaeftigt = ""; zeichnen(); fehler("Speichern hat nicht geklappt: " + e.message + ". Internet an? Bitte nochmal aufnehmen."); }
@@ -334,13 +445,15 @@ async function themaAnlegen() {
 
 function fehler(t) {
   const p = document.createElement("p"); p.className = "box fehler"; p.textContent = t;
-  (document.querySelector(reiter === "themen" ? ".aufnahme-zone, .neu-form" : ".satz.aktiv .steuer") || document.querySelector(".kopf")).append(p);
+  (document.querySelector(reiter === "ideen" ? ".ideen-zone" : reiter === "themen" ? ".aufnahme-zone, .neu-form" : ".satz.aktiv .steuer") || document.querySelector(".kopf")).append(p);
   setTimeout(() => p.remove(), 9000);
 }
 
 document.addEventListener("click", e => {
   const t = e.target;
-  if (t.closest("[data-rec]")) return rec && rec.state === "recording" ? rec.stop() : start();
+  if (t.closest("textarea, input")) return;
+  if (t.closest("[data-rec]")) return rec && rec.state === "recording" ? recStop() : start();
+  if (t.closest("[data-idee-speichern]")) return ideeSpeichern();
   if (t.closest("[data-behalten]")) return behalten();
   if (t.closest("[data-nochmal]")) { verwerfen(); return start(); }
   const rt = t.closest("[data-reiter]");
@@ -358,16 +471,28 @@ document.addEventListener("click", e => {
 document.addEventListener("toggle", e => { if (e.target.matches?.("details.tipps")) tippsAuf = e.target.open; }, true);
 document.addEventListener("submit", e => { if (e.target.id === "neu-form") { e.preventDefault(); themaAnlegen(); } });
 document.addEventListener("input", e => {
+  const nk = e.target.dataset && e.target.dataset.notiz;
+  if (nk === "@next") notizNext = e.target.value;
+  else if (nk === "@idee") ideeText = e.target.value;
+  else if (nk) { notizen[nk] = e.target.value; notizDirty.add(nk); notizSetStatus(nk, ""); notizPlan(nk); }
   if (e.target.id === "wer") { WER = e.target.value; try { localStorage.setItem("kabine_wer", WER); } catch (er) {} }
 });
+const notizFertig = e => { if (neuZeichnen) return; const nk = e.target.dataset && e.target.dataset.notiz; if (nk && nk[0] !== "@") notizSenden(nk); };
+document.addEventListener("focusout", notizFertig);
+document.addEventListener("change", notizFertig);
 document.addEventListener("keydown", e => {
   if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
-  if (reiter === "themen" && thema && e.code === "Space") { e.preventDefault(); if (!beschaeftigt) rec && rec.state === "recording" ? rec.stop() : start(); return; }
+  if (reiter === "ideen" && e.code === "Space") { e.preventDefault(); if (!beschaeftigt) rec && rec.state === "recording" ? recStop() : start(); return; }
+  if (reiter === "themen" && thema && e.code === "Space") { e.preventDefault(); if (!beschaeftigt) rec && rec.state === "recording" ? recStop() : start(); return; }
   if (!aktiv) return;
-  if (e.code === "Space") { e.preventDefault(); rec && rec.state === "recording" ? rec.stop() : !probe && start(); }
+  if (e.code === "Space") { e.preventDefault(); rec && rec.state === "recording" ? recStop() : !probe && start(); }
   if (e.code === "Enter" && probe) { e.preventDefault(); behalten(); }
 });
-document.addEventListener("visibilitychange", () => { if (!document.hidden && !(rec && rec.state === "recording") && !probe && !neuOffen && !beschaeftigt) laden(); });
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) { notizDirty.forEach(k => notizSenden(k)); return; }
+  const imFeld = document.activeElement && document.activeElement.matches && document.activeElement.matches("[data-notiz]");
+  if (!notizDirty.size && !imFeld && !(rec && rec.state === "recording") && !probe && !neuOffen && !beschaeftigt) laden();
+});
 laden();
 </script>
 </body>

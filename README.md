@@ -7,3 +7,12 @@ Nur für TikTok (@legendarysidequest): Handy-Seite zum Einsprechen. Aufnahmen ge
 - **Videos**: die festen Sätze pro Folge (Day 3, Day 4 ...) wie bisher.
 
 Themen sind Zeilen in `folgen` mit `art = 'thema'` (`info` = Kurzbeschreibung, `rang` = Reihenfolge, `saetze` = Vorschläge). Aufnahmen landen in `aufnahmen` mit `folge` = Themen-ID, `satz` = `n<Zeitstempel>`, `hash` = `wer:<Name>`.
+
+## Notizen (seit 2026-11-08)
+
+- **Schnitt-Notiz pro Satz**: Beim aktiven Satz (Videos) und bei jeder Aufnahme (Themen) gibt es ein Feld „📝 Was soll man hier sehen?“ (Szene, Meme, Clip, Kamera). Speichert automatisch.
+- **Ideen**: Reiter für Videoideen, Verbesserungen, Feedback. Tippen, mit der Handy-Tastatur diktieren oder als Sprachnotiz aufnehmen.
+- Gespeichert in Tabelle `notizen(folge, satz, text, at)`: Videos `satz` = Satz-ID, Themen `satz` = Aufnahme-ID, Ideen `folge = 'ideen'`, `satz = i<zeit>` (Text) bzw. Sprachnotiz in `aufnahmen` mit `folge = 'ideen'`.
+- Für den Schnitt holen: `select satz, text from notizen where folge = '<folge>' order by satz`.
+- Backend-Quelle: `supabase/kabine/index.ts` (Aktion `notiz`, leerer Text löscht), Migration `supabase/migrations/20261108_notizen.sql`.
+- Wiedergabe am iPhone: Mikro wird nach jeder Aufnahme freigegeben, damit Abspielen normal laut ist (nicht Telefon-Lautsprecher).
