@@ -103,6 +103,18 @@
   .notiz-feld.idee-neu { font-size: 18px; min-height: 112px; }
   .ideen-zone { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
   .ideen-zone .zeile { display: flex; gap: 8px; flex-wrap: wrap; }
+  .sounds-zone { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .sounds-zone input[type=search] { font: inherit; padding: 14px; border-radius: 10px; border: 1px solid var(--kante); background: var(--tresen); color: var(--kreide); }
+  .sounds-zone h2 { font: 24px/1 var(--anzeige); color: var(--bier); margin: 14px 0 2px; }
+  .sound { display: flex; gap: 12px; align-items: flex-start; text-align: left; width: 100%; font: inherit; color: var(--kreide);
+           background: var(--tresen); border: 1px solid var(--kante); border-radius: 12px; padding: 12px; cursor: pointer; }
+  .sound.spielt { border-color: var(--hopfen); }
+  .sound .play { font: 26px/1 var(--anzeige); min-width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--bier); color: var(--holz); flex: none; }
+  .sound.spielt .play { background: var(--hopfen); }
+  .sound .name { font-weight: 700; font-size: 17px; }
+  .sound .meta { color: var(--staub); font-size: 13px; line-height: 1.35; overflow-wrap: anywhere; }
+  .sound .meta a { color: var(--bier); }
+  .sound .warn { color: var(--neon); }
   @keyframes puls { 50% { opacity: .55; } }
 </style>
 </head>
@@ -110,13 +122,14 @@
 <main>
   <div class="kopf">
     <h1>Sprechkabine</h1>
-    <div class="reiter"><button data-reiter="themen">Themen</button><button data-reiter="videos">Videos</button><button data-reiter="ideen">Ideen</button></div>
+    <div class="reiter"><button data-reiter="themen">Themen</button><button data-reiter="videos">Videos</button><button data-reiter="ideen">Ideen</button><button data-reiter="sounds">Sounds</button></div>
     <div class="oben" id="oben">Lade…</div>
     <p id="hilfe"></p>
   </div>
   <div id="themen"></div>
   <div id="liste"></div>
   <div id="ideen"></div>
+  <div id="sounds" hidden></div>
 </main>
 <script>
 const API = "https://opqahbmbrvtbsxnxdjvw.supabase.co/functions/v1/kabine";
@@ -148,6 +161,7 @@ const fertig = f => f.saetze.length > 0 && f.saetze.every(s => statusVon(f, s) =
 
 // Schlüssel einmal einfügen, damit die Seite auch am Laptop ohne den langen Link geht
 function schluesselFrage(grund) {
+  if (reiter === "sounds") return zeichnen(); // Sounds brauchen keinen Schlüssel
   document.getElementById("oben").textContent = "Schlüssel fehlt";
   const html = `<form class="box" data-schluessel style="display:flex;flex-direction:column;gap:10px">
     <strong>${esc(grund)}</strong>
@@ -239,6 +253,8 @@ function zeichnenInnen() {
   document.getElementById("themen").hidden = reiter !== "themen";
   document.getElementById("liste").hidden = reiter !== "videos";
   document.getElementById("ideen").hidden = reiter !== "ideen";
+  document.getElementById("sounds").hidden = reiter !== "sounds";
+  if (reiter === "sounds") return soundsZeichnen();
   if (reiter === "themen") return themenZeichnen();
   if (reiter === "ideen") return ideenZeichnen();
   document.getElementById("hilfe").textContent = "Satz antippen, „Aufnehmen“, Satz ablesen, „Stopp“. Anhören und behalten. Sind alle Sätze da, „Video bauen“. Notiz: was soll man sehen?";
@@ -394,6 +410,59 @@ ${esc(notizNext)}</textarea></div>
         <audio controls preload="none" src="${tonUrl(t.id, a)}"></audio>
         ${notizFeld(t.id + "|" + a.satz, 2, "📝 Notiz zu dieser Aufnahme (Szene, Meme, Clip …)")}</div>`).join("") : '<p class="klein">Noch nichts aufgenommen. Einfach loslegen.</p>'}</div>`;
 }
+
+// ---- Sounds: Liste aller bisher benutzten Soundeffekte, Antippen spielt ab (kein Schlüssel nötig) ----
+let sounds = null, soundFehler = "", soundSuche = "", soundAudio = null, soundLaeuft = null;
+async function soundsLaden() {
+  try { const r = await fetch("soundeffekte/sounds.json"); if (!r.ok) throw new Error(r.status); sounds = await r.json(); }
+  catch (e) { soundFehler = e.message; }
+  if (reiter === "sounds") zeichnen();
+}
+function soundGruppe(x) {
+  const l = (x.lizenz || "") + " " + (x.quelle || "");
+  if (/prüfen|Fremdes|Film|Meme|CC BY/i.test(l)) return "Meme, Film und Fremdmaterial (Rechte beachten)";
+  if (/mixkit/i.test(l)) return "Mixkit (frei, keine Namensnennung)";
+  if (/selbst gebaut/i.test(l)) return "Selbst gebaut (frei)";
+  return "Sonstige";
+}
+function soundsZeichnen() {
+  const el = document.getElementById("sounds");
+  document.getElementById("hilfe").textContent = "Antippen spielt den Sound ab, nochmal antippen stoppt ihn.";
+  if (!sounds) {
+    document.getElementById("oben").textContent = soundFehler ? "Sounds nicht geladen" : "Lade Sounds…";
+    el.innerHTML = soundFehler ? `<p class="box fehler">Konnte die Sounds nicht laden: ${esc(soundFehler)}</p>` : "";
+    if (!soundFehler) soundsLaden();
+    return;
+  }
+  document.getElementById("oben").textContent = `${sounds.length} Soundeffekte`;
+  if (!el.querySelector("input")) el.innerHTML = `<div class="sounds-zone"><input type="search" id="sound-suche" placeholder="Suchen (Name, Folge, Einsatz)" aria-label="Sounds suchen"><div id="sound-liste"></div></div>`;
+  soundListe();
+}
+function soundListe() {
+  const q = soundSuche.trim().toLowerCase(), gr = {};
+  sounds.filter(x => !q || [x.name, x.einsatz, x.lizenz, (x.folgen || []).join(" ")].join(" ").toLowerCase().includes(q))
+    .forEach(x => (gr[soundGruppe(x)] ||= []).push(x));
+  const reihe = ["Meme, Film und Fremdmaterial (Rechte beachten)", "Selbst gebaut (frei)", "Mixkit (frei, keine Namensnennung)", "Sonstige"];
+  document.getElementById("sound-liste").innerHTML = reihe.filter(g => gr[g]).map(g => `<h2>${esc(g)} (${gr[g].length})</h2>` + gr[g].map(x => {
+    const link = /^https?:/.test(x.quelle || "") ? ` · <a href="${esc(x.quelle)}" target="_blank" rel="noopener">Quelle</a>` : x.quelle ? ` · ${esc(x.quelle)}` : "";
+    const warn = /prüfen|Fremdes|CC BY/i.test(x.lizenz || "");
+    return `<button class="sound${soundLaeuft === x.id ? " spielt" : ""}" data-sound="${esc(x.id)}"><span class="play">${soundLaeuft === x.id ? "■" : "▶"}</span>
+      <span><span class="name">${esc(x.name)}</span><br><span class="meta">${x.dauer_s} s${(x.folgen || []).length ? " · " + esc(x.folgen.join(", ")) : ""}${x.einsatz ? "<br>" + esc(x.einsatz) : ""}<br><span class="${warn ? "warn" : ""}">${esc(x.lizenz)}</span>${link}</span></span></button>`;
+  }).join("")).join("") || `<p class="box">Nichts gefunden.</p>`;
+}
+function soundSpielen(id) {
+  if (soundAudio) { soundAudio.pause(); soundAudio = null; }
+  const war = soundLaeuft; soundLaeuft = null;
+  if (war !== id) {
+    const a = soundAudio = new Audio(`soundeffekte/${encodeURIComponent(id)}.mp3`);
+    soundLaeuft = id;
+    a.onended = a.onerror = () => { if (soundAudio === a) { soundAudio = null; soundLaeuft = null; soundListe(); } };
+    a.play().catch(() => { if (soundAudio === a) { soundAudio = null; soundLaeuft = null; soundListe(); } });
+  }
+  soundListe();
+}
+document.addEventListener("input", e => { if (e.target.id === "sound-suche") { soundSuche = e.target.value; soundListe(); } });
+document.addEventListener("click", e => { const b = e.target.closest("[data-sound]"); if (b) soundSpielen(b.dataset.sound); });
 
 function ideenZeichnen() {
   const laeuft = rec && rec.state === "recording", voice = takes.ideen || [], vSaetze = new Set(voice.map(a => a.satz));
