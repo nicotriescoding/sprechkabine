@@ -1,0 +1,499 @@
+[
+ {
+  "id": "guess_whos_back",
+  "name": "Guess who's back (Intro-Ruf)",
+  "dauer_s": 5.55,
+  "einsatz": "Folgen-Intro / Figur ankündigen (WWE-/MMA-Announcement), Freeze-Bild mit 'X IS BACK'",
+  "quelle": "https://www.tiktok.com/@_.hound/video/7292580832353602858",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern. In der TikTok-App lizenzierte Sounds bevorzugen; hier nur auf Nicos Wunsch eingebaut.",
+  "folgen": [
+   "day10_florida2"
+  ]
+ },
+ {
+  "id": "fa_sound",
+  "name": "Fahhh (Meme-Sound)",
+  "dauer_s": 1.9,
+  "einsatz": "Peinlicher/absurder Moment, Bildwechsel auf Schlagzeile",
+  "quelle": "https://www.youtube.com/watch?v=TajAzT3CVJc",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern. In der TikTok-App lizenzierte Sounds bevorzugen; hier nur auf Nicos Wunsch eingebaut.; Lizenz auf YouTube nicht angegeben [prüfen]",
+  "folgen": [
+   "day10_florida2 (Szene 02 Bildwechsel bei 'swim', original)"
+  ]
+ },
+ {
+  "id": "day2_creeper_zisch_boom",
+  "name": "Creeper Zisch + Boom",
+  "dauer_s": 3.1,
+  "einsatz": "Explosion / Überraschung",
+  "quelle": "clips/day2/sfx/QUELLEN.txt",
+  "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
+  "folgen": [
+   "day2",
+   "day3_florida",
+   "day10_florida2"
+  ]
+ },
+ {
+  "id": "day2_ding",
+  "name": "Ding (Gameshow)",
+  "dauer_s": 1.4,
+  "einsatz": "Titel-Einblendung, kurze Betonung",
+  "quelle": "clips/day2/sfx/QUELLEN.txt",
+  "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
+  "folgen": [
+   "day2",
+   "day3_florida"
+  ]
+ },
+ {
+  "id": "day2_glocke_last_orders",
+  "name": "Tresenglocke \"Last Orders\"",
+  "dauer_s": 1.6,
+  "einsatz": "Outro/CTA, Kneipen-Szenen",
+  "quelle": "clips/day2/sfx/QUELLEN.txt",
+  "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
+  "folgen": [
+   "day2",
+   "day3_florida",
+   "day10_florida2"
+  ]
+ },
+ {
+  "id": "day2_gong",
+  "name": "Gong",
+  "dauer_s": 3.0,
+  "einsatz": "Titel, Kampfansage",
+  "quelle": "clips/day2/sfx/QUELLEN.txt",
+  "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
+  "folgen": [
+   "day2"
+  ]
+ },
+ {
+  "id": "day2_grillen",
+  "name": "Grillen (Stille)",
+  "dauer_s": 3.0,
+  "einsatz": "Peinliche Pause",
+  "quelle": "clips/day2/sfx/QUELLEN.txt",
+  "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
+  "folgen": [
+   "day2"
+  ]
+ },
+ {
+  "id": "day2_punch",
+  "name": "Punch (Treffer)",
+  "dauer_s": 0.35,
+  "einsatz": "Schlag-Treffer",
+  "quelle": "clips/day2/sfx/QUELLEN.txt",
+  "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
+  "folgen": [
+   "day2",
+   "day3_florida",
+   "day10_florida2"
+  ]
+ },
+ {
+  "id": "day2_rimshot",
+  "name": "Rimshot (Ba-dum-tss)",
+  "dauer_s": 1.9,
+  "einsatz": "Pointe",
+  "quelle": "clips/day2/sfx/QUELLEN.txt",
+  "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
+  "folgen": [
+   "day2",
+   "day3_florida"
+  ]
+ },
+ {
+  "id": "day2_trauer_trompete",
+  "name": "Trauer-Trompete",
+  "dauer_s": 2.65,
+  "einsatz": "Fail/Trauer-Pointe",
+  "quelle": "clips/day2/sfx/QUELLEN.txt",
+  "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
+  "folgen": [
+   "day2"
+  ]
+ },
+ {
+  "id": "day2_whoosh",
+  "name": "Whoosh",
+  "dauer_s": 0.45,
+  "einsatz": "Schnitt, Kick",
+  "quelle": "clips/day2/sfx/QUELLEN.txt",
+  "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
+  "folgen": [
+   "day2",
+   "day3_florida"
+  ]
+ },
+ {
+  "id": "day2_kneipen_atmo",
+  "name": "Kneipen-Atmo (Schleife)",
+  "dauer_s": 30.0,
+  "einsatz": "durchgehende Atmo unter allem",
+  "quelle": "clips/day2/sfx/QUELLEN.txt",
+  "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
+  "folgen": [
+   "day2",
+   "day3_florida",
+   "day10_florida2"
+  ]
+ },
+ {
+  "id": "day3_rasenmaeher",
+  "name": "Rasenmäher",
+  "dauer_s": 3.0,
+  "einsatz": "Florida-Man-Schlagzeilen",
+  "quelle": "clips/day3_florida/QUELLEN.txt",
+  "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
+  "folgen": [
+   "day3_florida",
+   "day10_florida2"
+  ]
+ },
+ {
+  "id": "day3_sirene",
+  "name": "Sirene",
+  "dauer_s": 2.5,
+  "einsatz": "Florida-Man-Schlagzeilen",
+  "quelle": "clips/day3_florida/QUELLEN.txt",
+  "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
+  "folgen": [
+   "day3_florida",
+   "day10_florida2"
+  ]
+ },
+ {
+  "id": "day3_telefon",
+  "name": "Telefon klingelt",
+  "dauer_s": 2.6,
+  "einsatz": "Florida-Man-Schlagzeilen",
+  "quelle": "clips/day3_florida/QUELLEN.txt",
+  "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
+  "folgen": [
+   "day3_florida"
+  ]
+ },
+ {
+  "id": "mixkit_bass_hit",
+  "name": "Mixkit: bass hit",
+  "dauer_s": 0.6,
+  "einsatz": "Treffer/Schnitte/Pointen",
+  "quelle": "https://mixkit.co/free-sound-effects/",
+  "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
+  "folgen": [
+   "day6",
+   "day7_nacktemeile"
+  ]
+ },
+ {
+  "id": "mixkit_cartoon_sterne",
+  "name": "Mixkit: cartoon sterne",
+  "dauer_s": 1.05,
+  "einsatz": "Treffer/Schnitte/Pointen",
+  "quelle": "https://mixkit.co/free-sound-effects/",
+  "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
+  "folgen": [
+   "day6",
+   "day7_nacktemeile",
+   "day10_florida2"
+  ]
+ },
+ {
+  "id": "mixkit_crowd_lacht",
+  "name": "Mixkit: crowd lacht",
+  "dauer_s": 2.2,
+  "einsatz": "Treffer/Schnitte/Pointen",
+  "quelle": "https://mixkit.co/free-sound-effects/",
+  "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
+  "folgen": [
+   "day6",
+   "day7_nacktemeile",
+   "day10_florida2"
+  ]
+ },
+ {
+  "id": "mixkit_glas_bruch",
+  "name": "Mixkit: glas bruch",
+  "dauer_s": 0.86,
+  "einsatz": "Treffer/Schnitte/Pointen",
+  "quelle": "https://mixkit.co/free-sound-effects/",
+  "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
+  "folgen": [
+   "day6",
+   "day7_nacktemeile"
+  ]
+ },
+ {
+  "id": "mixkit_grosser_impact",
+  "name": "Mixkit: grosser impact",
+  "dauer_s": 2.2,
+  "einsatz": "Treffer/Schnitte/Pointen",
+  "quelle": "https://mixkit.co/free-sound-effects/",
+  "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
+  "folgen": [
+   "day6",
+   "day7_nacktemeile"
+  ]
+ },
+ {
+  "id": "mixkit_impact_schlag",
+  "name": "Mixkit: impact schlag",
+  "dauer_s": 0.46,
+  "einsatz": "Treffer/Schnitte/Pointen",
+  "quelle": "https://mixkit.co/free-sound-effects/",
+  "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
+  "folgen": [
+   "day6",
+   "day7_nacktemeile",
+   "day10_florida2"
+  ]
+ },
+ {
+  "id": "mixkit_karate_punch",
+  "name": "Mixkit: karate punch",
+  "dauer_s": 0.6,
+  "einsatz": "Treffer/Schnitte/Pointen",
+  "quelle": "https://mixkit.co/free-sound-effects/",
+  "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
+  "folgen": [
+   "day6",
+   "day7_nacktemeile"
+  ]
+ },
+ {
+  "id": "mixkit_karate_tritt",
+  "name": "Mixkit: karate tritt",
+  "dauer_s": 0.6,
+  "einsatz": "Treffer/Schnitte/Pointen",
+  "quelle": "https://mixkit.co/free-sound-effects/",
+  "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
+  "folgen": [
+   "day6",
+   "day7_nacktemeile",
+   "day10_florida2"
+  ]
+ },
+ {
+  "id": "mixkit_kungfu_schlag",
+  "name": "Mixkit: kungfu schlag",
+  "dauer_s": 0.9,
+  "einsatz": "Treffer/Schnitte/Pointen",
+  "quelle": "https://mixkit.co/free-sound-effects/",
+  "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
+  "folgen": [
+   "day6",
+   "day7_nacktemeile"
+  ]
+ },
+ {
+  "id": "mixkit_punch_box",
+  "name": "Mixkit: punch box",
+  "dauer_s": 0.6,
+  "einsatz": "Treffer/Schnitte/Pointen",
+  "quelle": "https://mixkit.co/free-sound-effects/",
+  "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
+  "folgen": [
+   "day6",
+   "day7_nacktemeile"
+  ]
+ },
+ {
+  "id": "mixkit_punch_cartoon",
+  "name": "Mixkit: punch cartoon",
+  "dauer_s": 0.27,
+  "einsatz": "Treffer/Schnitte/Pointen",
+  "quelle": "https://mixkit.co/free-sound-effects/",
+  "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
+  "folgen": [
+   "day6",
+   "day7_nacktemeile"
+  ]
+ },
+ {
+  "id": "mixkit_punch_hart",
+  "name": "Mixkit: punch hart",
+  "dauer_s": 0.5,
+  "einsatz": "Treffer/Schnitte/Pointen",
+  "quelle": "https://mixkit.co/free-sound-effects/",
+  "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
+  "folgen": [
+   "day6",
+   "day7_nacktemeile"
+  ]
+ },
+ {
+  "id": "mixkit_punch_pfiff",
+  "name": "Mixkit: punch pfiff",
+  "dauer_s": 0.7,
+  "einsatz": "Treffer/Schnitte/Pointen",
+  "quelle": "https://mixkit.co/free-sound-effects/",
+  "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
+  "folgen": [
+   "day6",
+   "day7_nacktemeile"
+  ]
+ },
+ {
+  "id": "mixkit_punch_stark",
+  "name": "Mixkit: punch stark",
+  "dauer_s": 0.6,
+  "einsatz": "Treffer/Schnitte/Pointen",
+  "quelle": "https://mixkit.co/free-sound-effects/",
+  "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
+  "folgen": [
+   "day6",
+   "day7_nacktemeile"
+  ]
+ },
+ {
+  "id": "mixkit_slap",
+  "name": "Mixkit: slap",
+  "dauer_s": 0.21,
+  "einsatz": "Treffer/Schnitte/Pointen",
+  "quelle": "https://mixkit.co/free-sound-effects/",
+  "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
+  "folgen": [
+   "day6",
+   "day7_nacktemeile"
+  ]
+ },
+ {
+  "id": "mixkit_whoosh_filmisch",
+  "name": "Mixkit: whoosh filmisch",
+  "dauer_s": 1.33,
+  "einsatz": "Treffer/Schnitte/Pointen",
+  "quelle": "https://mixkit.co/free-sound-effects/",
+  "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
+  "folgen": [
+   "day6",
+   "day7_nacktemeile"
+  ]
+ },
+ {
+  "id": "mixkit_whoosh_schnell",
+  "name": "Mixkit: whoosh schnell",
+  "dauer_s": 1.2,
+  "einsatz": "Treffer/Schnitte/Pointen",
+  "quelle": "https://mixkit.co/free-sound-effects/",
+  "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
+  "folgen": [
+   "day6",
+   "day7_nacktemeile",
+   "day10_florida2"
+  ]
+ },
+ {
+  "id": "day6_film_pfeifen_here_i_come",
+  "name": "Pfeifen \"Here I come\" (Film)",
+  "dauer_s": 2.35,
+  "einsatz": "siehe Beschreibung",
+  "quelle": "clips/day6/QUELLEN.txt",
+  "lizenz": "Filmmaterial, nicht frei [prüfen]",
+  "folgen": [
+   "day6"
+  ]
+ },
+ {
+  "id": "day6_treppe_stolpern",
+  "name": "Treppe stolpern (Meme)",
+  "dauer_s": 1.95,
+  "einsatz": "siehe Beschreibung",
+  "quelle": "clips/day6/QUELLEN.txt",
+  "lizenz": "Meme-Material [prüfen]",
+  "folgen": [
+   "day6"
+  ]
+ },
+ {
+  "id": "day6_platte_kratzer",
+  "name": "Platten-Kratzer",
+  "dauer_s": 0.5,
+  "einsatz": "siehe Beschreibung",
+  "quelle": "clips/day6/QUELLEN.txt",
+  "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
+  "folgen": [
+   "day6"
+  ]
+ },
+ {
+  "id": "day6_lacher",
+  "name": "Sitcom-Lacher (lonemonk)",
+  "dauer_s": 3.4,
+  "einsatz": "siehe Beschreibung",
+  "quelle": "clips/day6/QUELLEN.txt",
+  "lizenz": "CC BY 3.0, Namensnennung nötig, in Day 6 v3 und Day 10 NICHT verwendet",
+  "folgen": [
+   "day6"
+  ]
+ },
+ {
+  "id": "day4_atmo_musik",
+  "name": "Atmo-Musik Day 4",
+  "dauer_s": 22.32,
+  "einsatz": "Day 4",
+  "quelle": "clips/day4/musik/QUELLEN.txt",
+  "lizenz": "siehe clips/day4/musik/QUELLEN.txt",
+  "folgen": [
+   "day4"
+  ]
+ },
+ {
+  "id": "day4_grillen_lang",
+  "name": "Grillen (lang)",
+  "dauer_s": 3.76,
+  "einsatz": "Day 4",
+  "quelle": "clips/day4/musik/QUELLEN.txt",
+  "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
+  "folgen": [
+   "day4"
+  ]
+ },
+ {
+  "id": "day4_pinkeln_kurz",
+  "name": "Pinkeln (kurz)",
+  "dauer_s": 1.19,
+  "einsatz": "Day 4",
+  "quelle": "clips/day4/musik/QUELLEN.txt",
+  "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
+  "folgen": [
+   "day4"
+  ]
+ },
+ {
+  "id": "day4_trauer_trompete_fade",
+  "name": "Trauer-Trompete (Fade)",
+  "dauer_s": 1.69,
+  "einsatz": "Day 4",
+  "quelle": "clips/day4/musik/QUELLEN.txt",
+  "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
+  "folgen": [
+   "day4"
+  ]
+ },
+ {
+  "id": "fa_sound_hoch",
+  "name": "Fahhh (hoch)",
+  "dauer_s": 1.78,
+  "einsatz": "Peinlicher/absurder Moment, Bildwechsel auf Schlagzeile",
+  "quelle": "https://www.youtube.com/watch?v=TajAzT3CVJc",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern. In der TikTok-App lizenzierte Sounds bevorzugen; hier nur auf Nicos Wunsch eingebaut.; Lizenz auf YouTube nicht angegeben [prüfen]",
+  "folgen": [
+   "day10_florida2 (Szene 03, Bildwechsel bei 'karate')"
+  ]
+ },
+ {
+  "id": "fa_sound_tief",
+  "name": "Fahhh (tief)",
+  "dauer_s": 2.04,
+  "einsatz": "Peinlicher/absurder Moment, Bildwechsel auf Schlagzeile",
+  "quelle": "https://www.youtube.com/watch?v=TajAzT3CVJc",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern. In der TikTok-App lizenzierte Sounds bevorzugen; hier nur auf Nicos Wunsch eingebaut.; Lizenz auf YouTube nicht angegeben [prüfen]",
+  "folgen": [
+   "day10_florida2 (Szene 04, Bildwechsel bei 'runs')"
+  ]
+ }
+]

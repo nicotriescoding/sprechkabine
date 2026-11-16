@@ -16,3 +16,8 @@ Themen sind Zeilen in `folgen` mit `art = 'thema'` (`info` = Kurzbeschreibung, `
 - Für den Schnitt holen: `select satz, text from notizen where folge = '<folge>' order by satz`.
 - Backend-Quelle: `supabase/kabine/index.ts` (Aktion `notiz`, leerer Text löscht), Migration `supabase/migrations/20261108_notizen.sql`.
 - Wiedergabe am iPhone: Mikro wird nach jeder Aufnahme freigegeben, damit Abspielen normal laut ist (nicht Telefon-Lautsprecher).
+
+## Sounds (seit 2026-11-16)
+
+- Reiter **Sounds**: alle bisher benutzten Soundeffekte mit Namen, Dauer, Folge, Einsatz und Lizenz; Antippen spielt ab, nochmal antippen stoppt. Suchfeld oben. Braucht keinen Schlüssel.
+- Dateien: `soundeffekte/<id>.mp3` (mono, klein, ca. 1 MB gesamt) und `soundeffekte/sounds.json`, abgeleitet aus Mac `clips/sounds/sounds.json`. Neuer Sound = mp3 + Eintrag in `sounds.json`.
