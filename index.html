@@ -216,10 +216,11 @@ function zeichnenInnen() {
   if (reiter === "themen") return themenZeichnen();
   if (reiter === "ideen") return ideenZeichnen();
   document.getElementById("hilfe").textContent = "Satz antippen, „Aufnehmen“, Satz ablesen, „Stopp“. Anhören und behalten. Sind alle Sätze da, „Video bauen“. Notiz: was soll man sehen?";
-  const offen = folgen.reduce((n, f) => n + f.saetze.filter(s => statusVon(f, s) !== "ok").length, 0);
-  document.getElementById("oben").textContent = folgen.length ? (offen ? `${offen} Sätze offen` : "Alles eingesprochen. Prost!") : "Noch keine Folge";
-  folgen.sort((a, b) => fertig(a) - fertig(b) || a.id.localeCompare(b.id));
-  document.getElementById("liste").innerHTML = folgen.map(f => {
+  // nur die 3 neuesten Folgen, neueste zuerst (ältere bleiben in Supabase, werden nur nicht gezeigt)
+  const neueste = [...folgen].sort((a, b) => String(b.geaendert || "").localeCompare(String(a.geaendert || "")) || b.id.localeCompare(a.id)).slice(0, 3);
+  const offen = neueste.reduce((n, f) => n + f.saetze.filter(s => statusVon(f, s) !== "ok").length, 0);
+  document.getElementById("oben").textContent = neueste.length ? (offen ? `${offen} Sätze offen` : "Alles eingesprochen. Prost!") : "Noch keine Folge";
+  document.getElementById("liste").innerHTML = neueste.map(f => {
     const st = f.saetze.map(s => statusVon(f, s)), n = st.filter(x => x === "ok").length, job = auftraege[f.id] || {};
     let info = fertig(f) ? "" : `<span class="klein">Noch ${f.saetze.length - n} von ${f.saetze.length} Sätzen offen.</span>`;
     if (job.status === "bestellt") info = `<span class="klein">Bestellt. Tipp auf „Claude Bescheid sagen“, dann baut Claude das Video.</span><a class="knopf" href="${WECKER}" target="_blank" rel="noopener">Claude Bescheid sagen</a>`;
