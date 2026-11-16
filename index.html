@@ -146,11 +146,37 @@ function statusVon(f, s) {
 }
 const fertig = f => f.saetze.length > 0 && f.saetze.every(s => statusVon(f, s) === "ok");
 
+// Schlüssel einmal einfügen, damit die Seite auch am Laptop ohne den langen Link geht
+function schluesselFrage(grund) {
+  document.getElementById("oben").textContent = "Schlüssel fehlt";
+  const html = `<form class="box" data-schluessel style="display:flex;flex-direction:column;gap:10px">
+    <strong>${esc(grund)}</strong>
+    <span class="klein">Füge den Schlüssel oder den ganzen Link ein (Ende: #k=…). Er wird in diesem Browser gemerkt.</span>
+    <input type="text" name="k" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Schlüssel oder Link" aria-label="Schlüssel oder Link" style="font:inherit;padding:14px;border-radius:10px;border:1px solid var(--kante);background:var(--tresen);color:var(--kreide)">
+    <button class="knopf zapf" type="submit">Speichern</button></form>`;
+  document.getElementById("themen").innerHTML = html;
+  document.getElementById("liste").innerHTML = "";
+  document.getElementById("themen").hidden = false;
+  document.getElementById("liste").hidden = true;
+  document.getElementById("ideen").hidden = true;
+}
+document.addEventListener("submit", e => {
+  const f = e.target.closest("[data-schluessel]"); if (!f) return;
+  e.preventDefault();
+  const roh = new FormData(f).get("k").trim();
+  const k = (roh.match(/[#&?]k=([^&\s]+)/) || [null, roh])[1];
+  if (k.length < 8) return;
+  K = decodeURIComponent(k);
+  try { localStorage.setItem("kabine_k", K); } catch (er) {}
+  laden();
+});
+
 async function laden() {
-  if (!K) { document.getElementById("oben").textContent = "Link ohne Schlüssel"; document.getElementById("themen").innerHTML = document.getElementById("liste").innerHTML = '<p class="box fehler">Bitte den Link aus dem Projekt öffnen, der Schlüssel fehlt.</p>'; return; }
+  if (!K) return schluesselFrage("Dieser Browser kennt den Schlüssel noch nicht.");
   try {
     const r = await fetch(`${API}?k=${encodeURIComponent(K)}`);
     const d = await r.json();
+    if (r.status === 403) { try { localStorage.removeItem("kabine_k"); } catch (e) {} K = null; return schluesselFrage("Der Schlüssel stimmt nicht (mehr)."); }
     if (!r.ok) throw new Error(d.fehler || r.status);
     themen = d.folgen.filter(f => f.art === "thema").sort((a, b) => (a.rang ?? 0) - (b.rang ?? 0));
     const tIds = new Set(themen.map(t => t.id));
