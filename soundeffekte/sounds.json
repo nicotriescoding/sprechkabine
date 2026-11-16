@@ -495,5 +495,32 @@
   "folgen": [
    "day10_florida2 (Szene 04, Bildwechsel bei 'runs')"
   ]
+ },
+ {
+  "id": "cash_kasse",
+  "name": "Cash / Kasse (Kaching)",
+  "dauer_s": 1.55,
+  "einsatz": "Geld/Gewinn, Preis- oder Belohnungs-Einblendung",
+  "quelle": "https://www.youtube.com/watch?v=4kVTqUxJYBA",
+  "lizenz": "Fremdes Material, Lizenz auf YouTube prüfen",
+  "folgen": []
+ },
+ {
+  "id": "flashback",
+  "name": "Flashback (Rückblick)",
+  "dauer_s": 4.39,
+  "einsatz": "Rückblende, Übergang in die Vergangenheit",
+  "quelle": "https://www.youtube.com/watch?v=SuUvPZDA25o",
+  "lizenz": "Fremdes Material, Lizenz auf YouTube prüfen",
+  "folgen": []
+ },
+ {
+  "id": "heartbeat",
+  "name": "Heartbeat (Herzschlag-Loop)",
+  "dauer_s": 5.07,
+  "einsatz": "Spannung, Angst, Showdown-Moment",
+  "quelle": "https://www.youtube.com/watch?v=gJpT_wHZeF8",
+  "lizenz": "Fremdes Material, Lizenz auf YouTube prüfen",
+  "folgen": []
  }
 ]
