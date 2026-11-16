@@ -180,8 +180,7 @@ async function laden() {
     if (!r.ok) throw new Error(d.fehler || r.status);
     themen = d.folgen.filter(f => f.art === "thema").sort((a, b) => (a.rang ?? 0) - (b.rang ?? 0));
     const tIds = new Set(themen.map(t => t.id));
-    // Nur die 3 neuesten Videos, neueste zuerst
-    folgen = d.folgen.filter(f => f.art !== "thema" && f.art !== "ideen").sort((a, b) => (Date.parse(b.geaendert) || 0) - (Date.parse(a.geaendert) || 0)).slice(0, 3); aufnahmen = {}; auftraege = {}; takes = {};
+    folgen = d.folgen.filter(f => f.art !== "thema" && f.art !== "ideen"); aufnahmen = {}; auftraege = {}; takes = {};
     d.aufnahmen.forEach(a => tIds.has(a.folge) || a.folge === "ideen" ? (takes[a.folge] ||= []).push(a) : aufnahmen[a.folge + "|" + a.satz] = a);
     Object.values(takes).forEach(l => l.sort((a, b) => String(b.at).localeCompare(String(a.at))));
     d.auftraege.forEach(a => auftraege[a.folge] = a);
@@ -243,9 +242,11 @@ function zeichnenInnen() {
   if (reiter === "themen") return themenZeichnen();
   if (reiter === "ideen") return ideenZeichnen();
   document.getElementById("hilfe").textContent = "Satz antippen, „Aufnehmen“, Satz ablesen, „Stopp“. Anhören und behalten. Sind alle Sätze da, „Video bauen“. Notiz: was soll man sehen?";
-  const offen = folgen.reduce((n, f) => n + f.saetze.filter(s => statusVon(f, s) !== "ok").length, 0);
-  document.getElementById("oben").textContent = folgen.length ? (offen ? `${offen} Sätze offen` : "Alles eingesprochen. Prost!") : "Noch keine Folge";
-  document.getElementById("liste").innerHTML = folgen.map(f => {
+  // nur die 3 neuesten Folgen, neueste zuerst (ältere bleiben in Supabase, werden nur nicht gezeigt)
+  const neueste = [...folgen].sort((a, b) => String(b.geaendert || "").localeCompare(String(a.geaendert || "")) || b.id.localeCompare(a.id)).slice(0, 3);
+  const offen = neueste.reduce((n, f) => n + f.saetze.filter(s => statusVon(f, s) !== "ok").length, 0);
+  document.getElementById("oben").textContent = neueste.length ? (offen ? `${offen} Sätze offen` : "Alles eingesprochen. Prost!") : "Noch keine Folge";
+  document.getElementById("liste").innerHTML = neueste.map(f => {
     const st = f.saetze.map(s => statusVon(f, s)), n = st.filter(x => x === "ok").length, job = auftraege[f.id] || {};
     let info = fertig(f) ? "" : `<span class="klein">Noch ${f.saetze.length - n} von ${f.saetze.length} Sätzen offen.</span>`;
     if (job.status === "bestellt") info = `<span class="klein">Bestellt. Tipp auf „Claude Bescheid sagen“, dann baut Claude das Video.</span><a class="knopf" href="${WECKER}" target="_blank" rel="noopener">Claude Bescheid sagen</a>`;
