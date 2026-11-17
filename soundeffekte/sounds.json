@@ -495,5 +495,201 @@
   "folgen": [
    "day10_florida2 (Szene 04, Bildwechsel bei 'runs')"
   ]
+ },
+ {
+  "id": "day12_sad_violin_intro",
+  "name": "Sad Violin (Day-12-Intro)",
+  "dauer_s": 10.0,
+  "einsatz": "Trauriger Auftakt / Hook mit Mitleid-Pointe",
+  "quelle": "https://www.youtube.com/watch?v=7ODcC5z6Ca0",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (YouTube „Sad Violin - Sound Effect (HD)“, Gaming Sound FX; Ausschnitt 10 s)",
+  "folgen": [
+   "day12_partypumper"
+  ]
+ },
+ {
+  "id": "day12_kichern",
+  "name": "Kichern (Giggle)",
+  "dauer_s": 1.35,
+  "einsatz": "Verschmitzter/peinlicher Moment, Kichern",
+  "quelle": "https://www.youtube.com/watch?v=0Yxl-lHsEq8",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (YouTube „20 Sound Effect For Edits“, Any Sound Effects; Ausschnitt 1,35 s)",
+  "folgen": [
+   "day12_partypumper"
+  ]
+ },
+ {
+  "id": "minecraft_essen",
+  "name": "Minecraft-Ess-Sound",
+  "dauer_s": 1.64,
+  "einsatz": "Figur frisst/isst etwas (Minecraft-Anspielung)",
+  "quelle": "https://www.youtube.com/watch?v=Fiaf796kieI",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (YouTube „Minecraft Eating - Sound Effect (HD)“, Gaming Sound FX)",
+  "folgen": [
+   "nature_doku"
+  ]
+ },
+ {
+  "id": "wolf_intro_filmton",
+  "name": "Wolf of Wall Street: Jordan recruits his friends (Filmton)",
+  "dauer_s": 13.4,
+  "einsatz": "Folgen-Intro im Wolf-of-Wall-Street-Stil (Day 8)",
+  "quelle": "https://www.youtube.com/watch?v=MPoggHQ2qIA",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (Film „The Wolf of Wall Street“, Paramount/Red Granite; Ausschnitt 10,55-23,95 s; Claim-Risiko bekannt)",
+  "folgen": [
+   "day8_wolf_intro"
+  ]
+ },
+ {
+  "id": "wolf_this_is_brad",
+  "name": "Wolf of Wall Street: „This is Brad“",
+  "dauer_s": 2.15,
+  "einsatz": "Kurze Vorstellung einer Figur (Day-8-Intro)",
+  "quelle": "https://www.youtube.com/watch?v=MPoggHQ2qIA",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (Film „The Wolf of Wall Street“; Ausschnitt 26,75-28,90 s; Claim-Risiko bekannt)",
+  "folgen": [
+   "day8_wolf_intro"
+  ]
+ },
+ {
+  "id": "yeehaw",
+  "name": "Yeehaw (Meme-Sound)",
+  "dauer_s": 2.67,
+  "einsatz": "Übertriebener Triumph/Cowboy-Moment, Florida-Man-Szenen",
+  "quelle": "https://www.youtube.com/watch?v=BodZ76rGAcg",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch",
+  "folgen": []
+ },
+ {
+  "id": "wow",
+  "name": "Wow (Anime-Wow)",
+  "dauer_s": 2.1,
+  "einsatz": "Staunen/Überraschung, Bildwechsel auf eine Enthüllung",
+  "quelle": "https://www.youtube.com/watch?v=BnTdfA5aTpY",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (YouTube „Anime WOW - Sound Effect (HD)“, Gaming Sound FX; Ausschnitt 0,3-2,4 s)",
+  "folgen": [
+   "claude_broke_my_game"
+  ]
+ },
+ {
+  "id": "wow_hoch",
+  "name": "Wow, hoch",
+  "dauer_s": 1.62,
+  "einsatz": "Staunen/Überraschung, Bildwechsel auf eine Enthüllung",
+  "quelle": "https://www.youtube.com/watch?v=BnTdfA5aTpY",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (YouTube „Anime WOW - Sound Effect (HD)“, Gaming Sound FX; Ausschnitt 0,3-2,4 s, tonhöhenverändert)",
+  "folgen": [
+   "claude_broke_my_game"
+  ]
+ },
+ {
+  "id": "wow_tief",
+  "name": "Wow, tief",
+  "dauer_s": 2.63,
+  "einsatz": "Staunen/Überraschung, Bildwechsel auf eine Enthüllung",
+  "quelle": "https://www.youtube.com/watch?v=BnTdfA5aTpY",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (YouTube „Anime WOW - Sound Effect (HD)“, Gaming Sound FX; Ausschnitt 0,3-2,4 s, tonhöhenverändert)",
+  "folgen": [
+   "claude_broke_my_game"
+  ]
+ },
+ {
+  "id": "wtf",
+  "name": "WTF",
+  "dauer_s": 1.95,
+  "einsatz": "Fassungsloser Moment",
+  "quelle": "https://www.youtube.com/watch?v=ZtknEOn-DfQ",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (YouTube „WTF - Sound Effect“, SFX - Sound Effects For Content Creators; Ausschnitt 0,1-2,05 s)",
+  "folgen": [
+   "claude_broke_my_game"
+  ]
+ },
+ {
+  "id": "bruh",
+  "name": "Bruh",
+  "dauer_s": 0.63,
+  "einsatz": "Enttäuschung/Facepalm-Moment, Bug-Szene",
+  "quelle": "https://remotion.media/bruh.wav",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (Bruh-Meme-Sound von remotion.media)",
+  "folgen": [
+   "claude_broke_my_game"
+  ]
+ },
+ {
+  "id": "bruh_hoch",
+  "name": "Bruh, hoch",
+  "dauer_s": 0.48,
+  "einsatz": "Enttäuschung/Facepalm-Moment, Bug-Szene",
+  "quelle": "https://remotion.media/bruh.wav",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (Bruh-Meme-Sound von remotion.media, Tempo/Tonhöhe verändert)",
+  "folgen": [
+   "claude_broke_my_game"
+  ]
+ },
+ {
+  "id": "bruh_tief",
+  "name": "Bruh, tief",
+  "dauer_s": 0.84,
+  "einsatz": "Enttäuschung/Facepalm-Moment, Bug-Szene",
+  "quelle": "https://remotion.media/bruh.wav",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (Bruh-Meme-Sound von remotion.media, Tempo/Tonhöhe verändert)",
+  "folgen": [
+   "claude_broke_my_game"
+  ]
+ },
+ {
+  "id": "bruh_langsam_tief",
+  "name": "Bruh, langsam und tief",
+  "dauer_s": 1.05,
+  "einsatz": "Enttäuschung/Facepalm-Moment, Bug-Szene",
+  "quelle": "https://remotion.media/bruh.wav",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (Bruh-Meme-Sound von remotion.media, Tempo/Tonhöhe verändert)",
+  "folgen": [
+   "claude_broke_my_game"
+  ]
+ },
+ {
+  "id": "bruh_schnell_hoch",
+  "name": "Bruh, schnell und hoch",
+  "dauer_s": 0.39,
+  "einsatz": "Enttäuschung/Facepalm-Moment, Bug-Szene",
+  "quelle": "https://remotion.media/bruh.wav",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (Bruh-Meme-Sound von remotion.media, Tempo/Tonhöhe verändert)",
+  "folgen": [
+   "claude_broke_my_game"
+  ]
+ },
+ {
+  "id": "fa_schnell",
+  "name": "Fahhh, schnell",
+  "dauer_s": 1.36,
+  "einsatz": "Peinlicher/absurder Moment, Bildwechsel auf Schlagzeile",
+  "quelle": "https://www.youtube.com/watch?v=TajAzT3CVJc",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (Variante des Fahhh-Sounds, YouTube „Fahhh- sound effect (HD)“, HighQualitySFX)",
+  "folgen": [
+   "claude_broke_my_game"
+  ]
+ },
+ {
+  "id": "fa_langsam",
+  "name": "Fahhh, langsam",
+  "dauer_s": 2.71,
+  "einsatz": "Peinlicher/absurder Moment, Bildwechsel auf Schlagzeile",
+  "quelle": "https://www.youtube.com/watch?v=TajAzT3CVJc",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (Variante des Fahhh-Sounds, YouTube „Fahhh- sound effect (HD)“, HighQualitySFX)",
+  "folgen": [
+   "claude_broke_my_game"
+  ]
+ },
+ {
+  "id": "fa_sehr_tief",
+  "name": "Fahhh, sehr tief",
+  "dauer_s": 2.55,
+  "einsatz": "Peinlicher/absurder Moment, Bildwechsel auf Schlagzeile",
+  "quelle": "https://www.youtube.com/watch?v=TajAzT3CVJc",
+  "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (Variante des Fahhh-Sounds, YouTube „Fahhh- sound effect (HD)“, HighQualitySFX)",
+  "folgen": [
+   "claude_broke_my_game"
+  ]
  }
 ]
