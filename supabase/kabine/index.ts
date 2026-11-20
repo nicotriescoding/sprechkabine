@@ -1,5 +1,6 @@
 // Nur für TikTok: Backend der Sprechkabine (Supabase Edge Function "kabine").
-// Jede Anfrage braucht den geheimen Schlüssel ?k=..., der im Link der Seite steckt.
+// Jede Anfrage (außer Sounds ansehen/abspielen) braucht den geheimen Schlüssel ?k=...:
+// entweder Nicos Schlüssel (im Link der Seite) oder den Claude-Token (einstellungen.claude_token).
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
@@ -11,20 +12,59 @@ const CORS = {
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json" } });
 
-let schluessel: string | null = null;
+let schluessel: string[] | null = null;
 async function erlaubt(k: string | null) {
   if (!schluessel) {
-    const { data } = await sb.from("einstellungen").select("wert").eq("name", "schluessel").single();
-    schluessel = data?.wert ?? null;
+    const { data } = await sb.from("einstellungen").select("wert").in("name", ["schluessel", "claude_token"]);
+    schluessel = (data ?? []).map((r) => r.wert).filter(Boolean);
   }
-  return !!k && !!schluessel && k === schluessel;
+  return !!k && schluessel.includes(k);
 }
+const liste = (v: string | null) => (v ?? "").split(",").map((x) => x.trim()).filter(Boolean).slice(0, 12);
+const fromHex = (h: unknown) => {
+  const hex = String(h).replace(/^\\x/, "");
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
+  return bytes;
+};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   const url = new URL(req.url);
-  if (!(await erlaubt(url.searchParams.get("k")))) return json({ fehler: "Falscher Schlüssel" }, 403);
   const aktion = url.searchParams.get("aktion") ?? "liste";
+
+  // Sounds ansehen/abspielen braucht keinen Schlüssel (Reiter Sounds), nur Hochladen.
+  if (req.method === "GET" && aktion === "soundliste") {
+    const r = await sb.from("sounds").select("id, name, dauer_s, einsatz, quelle, lizenz, folgen, stimmung, themen, at").order("at");
+    if (r.error) return json({ fehler: r.error.message }, 500);
+    return json(r.data);
+  }
+  if (req.method === "GET" && aktion === "soundton") {
+    const { data, error } = await sb.from("sounds").select("daten").eq("id", url.searchParams.get("id") ?? "").single();
+    if (error || !data?.daten) return json({ fehler: "Kein Sound" }, 404);
+    return new Response(fromHex(data.daten), { headers: { ...CORS, "Content-Type": "audio/mpeg", "Cache-Control": "public, max-age=3600" } });
+  }
+
+  if (!(await erlaubt(url.searchParams.get("k")))) return json({ fehler: "Falscher Schlüssel" }, 403);
+
+  if (req.method === "POST" && aktion === "soundneu") {
+    // Neuer Fremd-Sound (mp3 im Body) mit Quelle und Tags. Ohne Body werden nur die Angaben geändert.
+    const q = url.searchParams, id = q.get("id") ?? "";
+    if (!/^[\w-]{2,60}$/.test(id)) return json({ fehler: "Ungültige id" }, 400);
+    const body = new Uint8Array(await req.arrayBuffer());
+    if (body.length > 0 && (body.length < 500 || body.length > 3_000_000)) return json({ fehler: "Sound leer oder zu groß (max 3 MB)" }, 400);
+    const row: Record<string, unknown> = { id, at: new Date().toISOString() };
+    const t = (n: string, max: number) => (q.get(n) ?? "").trim().slice(0, max);
+    if (t("name", 80)) row.name = t("name", 80);
+    for (const n of ["einsatz", "quelle", "lizenz"]) if (q.has(n)) row[n] = t(n, 400);
+    for (const n of ["folgen", "stimmung", "themen"]) if (q.has(n)) row[n] = liste(q.get(n));
+    if (q.get("dauer_s")) row.dauer_s = Number(q.get("dauer_s"));
+    if (body.length > 0) row.daten = "\\x" + Array.from(body, (b) => b.toString(16).padStart(2, "0")).join("");
+    if (!row.name && body.length > 0) row.name = id;
+    const r = await sb.from("sounds").upsert(row);
+    if (r.error) return json({ fehler: r.error.message }, 500);
+    return json({ ok: true, id });
+  }
 
   if (req.method === "GET" && aktion === "liste") {
     const [f, a, j, n] = await Promise.all([

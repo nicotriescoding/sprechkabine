@@ -115,6 +115,16 @@
   .sound .meta { color: var(--staub); font-size: 13px; line-height: 1.35; overflow-wrap: anywhere; }
   .sound .meta a { color: var(--bier); }
   .sound .warn { color: var(--neon); }
+  .filterleiste { padding: 8px 0; display: flex; flex-direction: column; gap: 8px; }
+  .filterleiste .zeile { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .filterleiste select { font: inherit; padding: 10px; border-radius: 10px; border: 1px solid var(--kante); background: var(--tresen); color: var(--kreide); }
+  .chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { font: inherit; font-size: 14px; flex: none; padding: 8px 14px; min-height: 40px; border-radius: 999px; border: 1px solid var(--kante); background: var(--tresen); color: var(--kreide); cursor: pointer; }
+  .chip.an { background: var(--bier); color: var(--holz); border-color: var(--bier); font-weight: 700; }
+  .chip.reset { border-style: dashed; }
+  .tag { display: inline-block; font-size: 12px; padding: 2px 8px; margin: 4px 4px 0 0; border-radius: 999px; background: var(--kante); color: var(--kreide); }
+  .tag.neu { background: var(--hopfen); color: var(--holz); }
   @keyframes puls { 50% { opacity: .55; } }
 </style>
 </head>
@@ -411,19 +421,27 @@ ${esc(notizNext)}</textarea></div>
         ${notizFeld(t.id + "|" + a.satz, 2, "📝 Notiz zu dieser Aufnahme (Szene, Meme, Clip …)")}</div>`).join("") : '<p class="klein">Noch nichts aufgenommen. Einfach loslegen.</p>'}</div>`;
 }
 
-// ---- Sounds: Liste aller bisher benutzten Soundeffekte, Antippen spielt ab (kein Schlüssel nötig) ----
+// ---- Sounds: alle benutzten Soundeffekte, mit Suche, Filtern (Stimmung, Thema) und Sortierung. Kein Schlüssel nötig ----
+// Quellen: soundeffekte/sounds.json + tags.json (Repo) und Tabelle sounds (Funktion kabine, automatisch hochgeladene Sounds).
 let sounds = null, soundFehler = "", soundSuche = "", soundAudio = null, soundLaeuft = null;
+let sFilter = { stimmung: new Set(), thema: new Set() }, sSort = "neu";
+const STIMMUNGEN = ["witzig", "schock", "angst", "freude", "traurig", "spannung", "episch", "cringe", "wut", "ruhig"];
+const THEMEN = ["Meme", "Film & TV", "Gaming", "Minecraft", "Dating-App", "Kampf", "Kneipe", "Tiere", "Ansage", "Fail", "Technik", "Geld", "Musik", "Schnitt", "Alarm", "Stimme"];
 async function soundsLaden() {
-  try { const r = await fetch("soundeffekte/sounds.json"); if (!r.ok) throw new Error(r.status); sounds = await r.json(); }
-  catch (e) { soundFehler = e.message; }
+  try {
+    const [r, t, d] = await Promise.all([
+      fetch("soundeffekte/sounds.json"), fetch("soundeffekte/tags.json").catch(() => null),
+      fetch(`${API}?aktion=soundliste`).catch(() => null)]);
+    if (!r.ok) throw new Error(r.status);
+    const stat = await r.json(), tags = t && t.ok ? await t.json() : {};
+    stat.forEach((x, i) => { Object.assign(x, tags[x.id] || {}); x.rang = i; x.quelleUrl = `soundeffekte/${encodeURIComponent(x.id)}.mp3`; });
+    let dyn = [];
+    try { if (d && d.ok) dyn = await d.json(); } catch (e) {}
+    const bekannt = new Set(stat.map(x => x.id));
+    dyn.filter(x => !bekannt.has(x.id)).forEach((x, i) => { x.rang = 1000 + i; x.neu = true; x.quelleUrl = `${API}?aktion=soundton&id=${encodeURIComponent(x.id)}`; });
+    sounds = stat.concat(dyn.filter(x => !bekannt.has(x.id)));
+  } catch (e) { soundFehler = e.message; }
   if (reiter === "sounds") zeichnen();
-}
-function soundGruppe(x) {
-  const l = (x.lizenz || "") + " " + (x.quelle || "");
-  if (/prüfen|Fremdes|Film|Meme|CC BY/i.test(l)) return "Meme, Film und Fremdmaterial (Rechte beachten)";
-  if (/mixkit/i.test(l)) return "Mixkit (frei, keine Namensnennung)";
-  if (/selbst gebaut/i.test(l)) return "Selbst gebaut (frei)";
-  return "Sonstige";
 }
 function soundsZeichnen() {
   const el = document.getElementById("sounds");
@@ -434,27 +452,45 @@ function soundsZeichnen() {
     if (!soundFehler) soundsLaden();
     return;
   }
-  document.getElementById("oben").textContent = `${sounds.length} Soundeffekte`;
-  if (!el.querySelector("input")) el.innerHTML = `<div class="sounds-zone"><input type="search" id="sound-suche" placeholder="Suchen (Name, Folge, Einsatz)" aria-label="Sounds suchen"><div id="sound-liste"></div></div>`;
+  if (!el.querySelector("input")) {
+    const chip = (art, w) => `<button class="chip" data-chip="${art}" data-wert="${esc(w)}">${esc(w)}</button>`;
+    el.innerHTML = `<div class="sounds-zone"><div class="filterleiste">
+      <input type="search" id="sound-suche" placeholder="Suchen (Name, Folge, Einsatz, Quelle)" aria-label="Sounds suchen">
+      <div class="chips" aria-label="Stimmung">${STIMMUNGEN.map(w => chip("stimmung", w)).join("")}</div>
+      <div class="chips" aria-label="Thema">${THEMEN.map(w => chip("thema", w)).join("")}</div>
+      <div class="zeile"><select id="sound-sort" aria-label="Sortieren"><option value="neu">Neueste zuerst</option><option value="kurz">Kürzeste zuerst</option><option value="lang">Längste zuerst</option><option value="az">Name A–Z</option></select>
+      <button class="chip reset" id="sound-reset" hidden>Filter zurücksetzen</button><span id="sound-zahl" class="meta"></span></div></div>
+      <div id="sound-liste"></div></div>`;
+  }
   soundListe();
 }
 function soundListe() {
-  const q = soundSuche.trim().toLowerCase(), gr = {};
-  sounds.filter(x => !q || [x.name, x.einsatz, x.lizenz, (x.folgen || []).join(" ")].join(" ").toLowerCase().includes(q))
-    .forEach(x => (gr[soundGruppe(x)] ||= []).push(x));
-  const reihe = ["Meme, Film und Fremdmaterial (Rechte beachten)", "Selbst gebaut (frei)", "Mixkit (frei, keine Namensnennung)", "Sonstige"];
-  document.getElementById("sound-liste").innerHTML = reihe.filter(g => gr[g]).map(g => `<h2>${esc(g)} (${gr[g].length})</h2>` + gr[g].map(x => {
+  const q = soundSuche.trim().toLowerCase(), f = sFilter;
+  let l = sounds.filter(x => (!q || [x.name, x.einsatz, x.lizenz, x.quelle, (x.folgen || []).join(" "), (x.stimmung || []).join(" "), (x.themen || []).join(" ")].join(" ").toLowerCase().includes(q))
+    && [...f.stimmung].every(w => (x.stimmung || []).includes(w)) && [...f.thema].every(w => (x.themen || []).includes(w)));
+  const dauer = x => Number(x.dauer_s) || 0;
+  l.sort(sSort === "kurz" ? (a, b) => dauer(a) - dauer(b) : sSort === "lang" ? (a, b) => dauer(b) - dauer(a)
+    : sSort === "az" ? (a, b) => a.name.localeCompare(b.name, "de") : (a, b) => b.rang - a.rang);
+  document.querySelectorAll("[data-chip]").forEach(c => c.classList.toggle("an", f[c.dataset.chip].has(c.dataset.wert)));
+  const hat = f.stimmung.size + f.thema.size > 0 || q;
+  const rs = document.getElementById("sound-reset"); if (rs) rs.hidden = !hat;
+  const zahl = document.getElementById("sound-zahl"); if (zahl) zahl.textContent = `${l.length} von ${sounds.length}`;
+  document.getElementById("oben").textContent = `${sounds.length} Soundeffekte`;
+  document.getElementById("sound-liste").innerHTML = l.map(x => {
     const link = /^https?:/.test(x.quelle || "") ? ` · <a href="${esc(x.quelle)}" target="_blank" rel="noopener">Quelle</a>` : x.quelle ? ` · ${esc(x.quelle)}` : "";
     const warn = /prüfen|Fremdes|CC BY/i.test(x.lizenz || "");
+    const tags = [...(x.stimmung || []), ...(x.themen || [])].map(t => `<span class="tag">${esc(t)}</span>`).join("");
     return `<button class="sound${soundLaeuft === x.id ? " spielt" : ""}" data-sound="${esc(x.id)}"><span class="play">${soundLaeuft === x.id ? "■" : "▶"}</span>
-      <span><span class="name">${esc(x.name)}</span><br><span class="meta">${x.dauer_s} s${(x.folgen || []).length ? " · " + esc(x.folgen.join(", ")) : ""}${x.einsatz ? "<br>" + esc(x.einsatz) : ""}<br><span class="${warn ? "warn" : ""}">${esc(x.lizenz)}</span>${link}</span></span></button>`;
-  }).join("")).join("") || `<p class="box">Nichts gefunden.</p>`;
+      <span><span class="name">${esc(x.name)}${x.neu ? ' <span class="tag neu">neu</span>' : ""}</span><br><span class="meta">${dauer(x)} s${(x.folgen || []).length ? " · " + esc(x.folgen.join(", ")) : ""}${x.einsatz ? "<br>" + esc(x.einsatz) : ""}</span>
+      <br>${tags}<br><span class="meta"><span class="${warn ? "warn" : ""}">${esc(x.lizenz || "")}</span>${link}</span></span></button>`;
+  }).join("") || `<p class="box">Nichts gefunden.</p>`;
 }
 function soundSpielen(id) {
   if (soundAudio) { soundAudio.pause(); soundAudio = null; }
   const war = soundLaeuft; soundLaeuft = null;
-  if (war !== id) {
-    const a = soundAudio = new Audio(`soundeffekte/${encodeURIComponent(id)}.mp3`);
+  const x = sounds.find(s => s.id === id);
+  if (war !== id && x) {
+    const a = soundAudio = new Audio(x.quelleUrl);
     soundLaeuft = id;
     a.onended = a.onerror = () => { if (soundAudio === a) { soundAudio = null; soundLaeuft = null; soundListe(); } };
     a.play().catch(() => { if (soundAudio === a) { soundAudio = null; soundLaeuft = null; soundListe(); } });
@@ -462,7 +498,13 @@ function soundSpielen(id) {
   soundListe();
 }
 document.addEventListener("input", e => { if (e.target.id === "sound-suche") { soundSuche = e.target.value; soundListe(); } });
-document.addEventListener("click", e => { const b = e.target.closest("[data-sound]"); if (b) soundSpielen(b.dataset.sound); });
+document.addEventListener("change", e => { if (e.target.id === "sound-sort") { sSort = e.target.value; soundListe(); } });
+document.addEventListener("click", e => {
+  const c = e.target.closest("[data-chip]");
+  if (c) { const m = sFilter[c.dataset.chip]; m.has(c.dataset.wert) ? m.delete(c.dataset.wert) : m.add(c.dataset.wert); return soundListe(); }
+  if (e.target.id === "sound-reset") { sFilter = { stimmung: new Set(), thema: new Set() }; soundSuche = ""; document.getElementById("sound-suche").value = ""; return soundListe(); }
+  const b = e.target.closest("[data-sound]"); if (b) soundSpielen(b.dataset.sound);
+});
 
 function ideenZeichnen() {
   const laeuft = rec && rec.state === "recording", voice = takes.ideen || [], vSaetze = new Set(voice.map(a => a.satz));
