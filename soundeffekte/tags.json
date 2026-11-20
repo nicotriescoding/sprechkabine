@@ -1,0 +1,968 @@
+{
+"guess_whos_back": {
+"stimmung": [
+"episch",
+"spannung"
+],
+"themen": [
+"Ansage",
+"Film & TV",
+"Meme"
+]
+},
+"fa_sound": {
+"stimmung": [
+"witzig",
+"cringe"
+],
+"themen": [
+"Meme",
+"Fail"
+]
+},
+"day2_creeper_zisch_boom": {
+"stimmung": [
+"schock",
+"witzig"
+],
+"themen": [
+"Minecraft",
+"Gaming"
+]
+},
+"day2_ding": {
+"stimmung": [
+"freude"
+],
+"themen": [
+"Schnitt"
+]
+},
+"day2_glocke_last_orders": {
+"stimmung": [
+"ruhig"
+],
+"themen": [
+"Kneipe",
+"Ansage"
+]
+},
+"day2_gong": {
+"stimmung": [
+"episch"
+],
+"themen": [
+"Kampf",
+"Ansage"
+]
+},
+"day2_grillen": {
+"stimmung": [
+"cringe"
+],
+"themen": [
+"Meme",
+"Fail"
+]
+},
+"day2_punch": {
+"stimmung": [
+"schock"
+],
+"themen": [
+"Kampf"
+]
+},
+"day2_rimshot": {
+"stimmung": [
+"witzig"
+],
+"themen": [
+"Meme"
+]
+},
+"day2_trauer_trompete": {
+"stimmung": [
+"traurig",
+"witzig"
+],
+"themen": [
+"Fail"
+]
+},
+"day2_whoosh": {
+"stimmung": [
+"ruhig"
+],
+"themen": [
+"Schnitt"
+]
+},
+"day2_kneipen_atmo": {
+"stimmung": [
+"ruhig"
+],
+"themen": [
+"Kneipe"
+]
+},
+"day3_rasenmaeher": {
+"stimmung": [
+"witzig"
+],
+"themen": [
+"Alarm"
+]
+},
+"day3_sirene": {
+"stimmung": [
+"schock"
+],
+"themen": [
+"Alarm"
+]
+},
+"day3_telefon": {
+"stimmung": [
+"ruhig"
+],
+"themen": [
+"Alarm"
+]
+},
+"mixkit_bass_hit": {
+"stimmung": [
+"schock",
+"episch"
+],
+"themen": [
+"Schnitt"
+]
+},
+"mixkit_cartoon_sterne": {
+"stimmung": [
+"witzig"
+],
+"themen": [
+"Kampf",
+"Fail"
+]
+},
+"mixkit_crowd_lacht": {
+"stimmung": [
+"witzig",
+"freude"
+],
+"themen": [
+"Meme"
+]
+},
+"mixkit_glas_bruch": {
+"stimmung": [
+"schock"
+],
+"themen": [
+"Kneipe",
+"Kampf"
+]
+},
+"mixkit_grosser_impact": {
+"stimmung": [
+"episch",
+"schock"
+],
+"themen": [
+"Schnitt"
+]
+},
+"mixkit_impact_schlag": {
+"stimmung": [
+"schock"
+],
+"themen": [
+"Kampf"
+]
+},
+"mixkit_karate_punch": {
+"stimmung": [
+"wut"
+],
+"themen": [
+"Kampf"
+]
+},
+"mixkit_karate_tritt": {
+"stimmung": [
+"wut"
+],
+"themen": [
+"Kampf"
+]
+},
+"mixkit_kungfu_schlag": {
+"stimmung": [
+"wut"
+],
+"themen": [
+"Kampf"
+]
+},
+"mixkit_punch_box": {
+"stimmung": [
+"wut"
+],
+"themen": [
+"Kampf"
+]
+},
+"mixkit_punch_cartoon": {
+"stimmung": [
+"witzig"
+],
+"themen": [
+"Kampf"
+]
+},
+"mixkit_punch_hart": {
+"stimmung": [
+"wut",
+"schock"
+],
+"themen": [
+"Kampf"
+]
+},
+"mixkit_punch_pfiff": {
+"stimmung": [
+"witzig"
+],
+"themen": [
+"Kampf"
+]
+},
+"mixkit_punch_stark": {
+"stimmung": [
+"wut"
+],
+"themen": [
+"Kampf"
+]
+},
+"mixkit_slap": {
+"stimmung": [
+"witzig",
+"schock"
+],
+"themen": [
+"Kampf"
+]
+},
+"mixkit_whoosh_filmisch": {
+"stimmung": [
+"episch"
+],
+"themen": [
+"Schnitt"
+]
+},
+"mixkit_whoosh_schnell": {
+"stimmung": [
+"ruhig"
+],
+"themen": [
+"Schnitt"
+]
+},
+"day6_film_pfeifen_here_i_come": {
+"stimmung": [
+"witzig",
+"spannung"
+],
+"themen": [
+"Film & TV",
+"Meme"
+]
+},
+"day6_treppe_stolpern": {
+"stimmung": [
+"witzig"
+],
+"themen": [
+"Meme",
+"Fail"
+]
+},
+"day6_platte_kratzer": {
+"stimmung": [
+"witzig",
+"cringe"
+],
+"themen": [
+"Meme",
+"Fail"
+]
+},
+"day6_lacher": {
+"stimmung": [
+"witzig",
+"freude"
+],
+"themen": [
+"Film & TV"
+]
+},
+"day4_atmo_musik": {
+"stimmung": [
+"ruhig"
+],
+"themen": [
+"Musik"
+]
+},
+"day4_grillen_lang": {
+"stimmung": [
+"cringe"
+],
+"themen": [
+"Meme",
+"Fail"
+]
+},
+"day4_pinkeln_kurz": {
+"stimmung": [
+"witzig"
+],
+"themen": [
+"Kneipe"
+]
+},
+"day4_trauer_trompete_fade": {
+"stimmung": [
+"traurig",
+"witzig"
+],
+"themen": [
+"Fail"
+]
+},
+"fa_sound_hoch": {
+"stimmung": [
+"witzig",
+"cringe"
+],
+"themen": [
+"Meme",
+"Fail"
+]
+},
+"fa_sound_tief": {
+"stimmung": [
+"witzig",
+"cringe"
+],
+"themen": [
+"Meme",
+"Fail"
+]
+},
+"fa_schnell": {
+"stimmung": [
+"witzig",
+"cringe"
+],
+"themen": [
+"Meme",
+"Fail"
+]
+},
+"fa_langsam": {
+"stimmung": [
+"witzig",
+"cringe"
+],
+"themen": [
+"Meme",
+"Fail"
+]
+},
+"fa_sehr_tief": {
+"stimmung": [
+"witzig",
+"cringe"
+],
+"themen": [
+"Meme",
+"Fail"
+]
+},
+"fahh_warrior": {
+"stimmung": [
+"witzig",
+"cringe"
+],
+"themen": [
+"Meme",
+"Fail"
+]
+},
+"day12_sad_violin_intro": {
+"stimmung": [
+"traurig"
+],
+"themen": [
+"Musik",
+"Meme"
+]
+},
+"day12_kichern": {
+"stimmung": [
+"witzig",
+"cringe"
+],
+"themen": [
+"Stimme"
+]
+},
+"minecraft_essen": {
+"stimmung": [
+"witzig",
+"ruhig"
+],
+"themen": [
+"Minecraft",
+"Gaming"
+]
+},
+"wolf_intro_filmton": {
+"stimmung": [
+"episch",
+"freude"
+],
+"themen": [
+"Film & TV",
+"Ansage"
+]
+},
+"wolf_this_is_brad": {
+"stimmung": [
+"witzig"
+],
+"themen": [
+"Film & TV",
+"Ansage"
+]
+},
+"yeehaw": {
+"stimmung": [
+"freude",
+"witzig"
+],
+"themen": [
+"Meme",
+"Stimme"
+]
+},
+"wow": {
+"stimmung": [
+"freude",
+"schock"
+],
+"themen": [
+"Meme",
+"Stimme"
+]
+},
+"wow_hoch": {
+"stimmung": [
+"freude",
+"schock"
+],
+"themen": [
+"Meme",
+"Stimme"
+]
+},
+"wow_tief": {
+"stimmung": [
+"freude",
+"schock"
+],
+"themen": [
+"Meme",
+"Stimme"
+]
+},
+"wtf": {
+"stimmung": [
+"schock",
+"witzig"
+],
+"themen": [
+"Meme",
+"Stimme"
+]
+},
+"bruh": {
+"stimmung": [
+"cringe",
+"witzig"
+],
+"themen": [
+"Meme",
+"Stimme"
+]
+},
+"bruh_hoch": {
+"stimmung": [
+"cringe",
+"witzig"
+],
+"themen": [
+"Meme",
+"Stimme"
+]
+},
+"bruh_tief": {
+"stimmung": [
+"cringe",
+"witzig"
+],
+"themen": [
+"Meme",
+"Stimme"
+]
+},
+"bruh_langsam_tief": {
+"stimmung": [
+"cringe",
+"witzig"
+],
+"themen": [
+"Meme",
+"Stimme"
+]
+},
+"bruh_schnell_hoch": {
+"stimmung": [
+"cringe",
+"witzig"
+],
+"themen": [
+"Meme",
+"Stimme"
+]
+},
+"cash_kasse": {
+"stimmung": [
+"freude"
+],
+"themen": [
+"Geld"
+]
+},
+"flashback": {
+"stimmung": [
+"ruhig",
+"spannung"
+],
+"themen": [
+"Film & TV",
+"Schnitt"
+]
+},
+"heartbeat": {
+"stimmung": [
+"angst",
+"spannung"
+],
+"themen": [
+"Film & TV"
+]
+},
+"god_damn": {
+"stimmung": [
+"schock",
+"wut"
+],
+"themen": [
+"Meme",
+"Stimme"
+]
+},
+"spawn": {
+"stimmung": [
+"ruhig"
+],
+"themen": [
+"Gaming",
+"Schnitt"
+]
+},
+"metal_pipe_loud": {
+"stimmung": [
+"schock",
+"witzig"
+],
+"themen": [
+"Meme",
+"Fail"
+]
+},
+"undertakers_bell": {
+"stimmung": [
+"angst",
+"episch"
+],
+"themen": [
+"Kampf",
+"Ansage",
+"Film & TV"
+]
+},
+"travis_scott_meme": {
+"stimmung": [
+"witzig"
+],
+"themen": [
+"Meme",
+"Musik"
+]
+},
+"mentality": {
+"stimmung": [
+"episch",
+"witzig"
+],
+"themen": [
+"Meme"
+]
+},
+"ps2_startup": {
+"stimmung": [
+"ruhig",
+"episch"
+],
+"themen": [
+"Gaming",
+"Technik"
+]
+},
+"french_meme": {
+"stimmung": [
+"witzig"
+],
+"themen": [
+"Meme",
+"Stimme"
+]
+},
+"bass_drop": {
+"stimmung": [
+"episch",
+"schock"
+],
+"themen": [
+"Musik",
+"Schnitt"
+]
+},
+"windows95_startup": {
+"stimmung": [
+"ruhig"
+],
+"themen": [
+"Technik",
+"Meme"
+]
+},
+"windows_xp_start": {
+"stimmung": [
+"freude",
+"ruhig"
+],
+"themen": [
+"Technik",
+"Meme"
+]
+},
+"windows_xp_shutdown": {
+"stimmung": [
+"traurig",
+"ruhig"
+],
+"themen": [
+"Technik",
+"Meme"
+]
+},
+"english_or_spanish": {
+"stimmung": [
+"witzig"
+],
+"themen": [
+"Meme",
+"Film & TV",
+"Stimme"
+]
+},
+"flashbang": {
+"stimmung": [
+"schock"
+],
+"themen": [
+"Gaming",
+"Kampf"
+]
+},
+"credit_score_siren": {
+"stimmung": [
+"schock",
+"witzig"
+],
+"themen": [
+"Alarm",
+"Geld",
+"Meme"
+]
+},
+"exaggerated_among_us": {
+"stimmung": [
+"schock",
+"witzig"
+],
+"themen": [
+"Gaming",
+"Meme"
+]
+},
+"long_brain_fart": {
+"stimmung": [
+"witzig",
+"cringe"
+],
+"themen": [
+"Meme",
+"Fail"
+]
+},
+"echo_voice": {
+"stimmung": [
+"spannung",
+"angst"
+],
+"themen": [
+"Stimme",
+"Meme"
+]
+},
+"bye_bye_mewing": {
+"stimmung": [
+"witzig"
+],
+"themen": [
+"Meme",
+"Stimme"
+]
+},
+"crowd_laugh_warrior": {
+"stimmung": [
+"witzig",
+"freude"
+],
+"themen": [
+"Meme"
+]
+},
+"get_out": {
+"stimmung": [
+"wut",
+"schock"
+],
+"themen": [
+"Meme",
+"Stimme"
+]
+},
+"glass_breaking_warrior": {
+"stimmung": [
+"schock"
+],
+"themen": [
+"Kneipe",
+"Kampf"
+]
+},
+"rdr2_low_honor": {
+"stimmung": [
+"traurig",
+"spannung"
+],
+"themen": [
+"Gaming",
+"Musik"
+]
+},
+"grandma_house": {
+"stimmung": [
+"witzig"
+],
+"themen": [
+"Meme"
+]
+},
+"collect_gold": {
+"stimmung": [
+"freude"
+],
+"themen": [
+"Gaming",
+"Geld"
+]
+},
+"slow_motion": {
+"stimmung": [
+"spannung",
+"episch"
+],
+"themen": [
+"Film & TV",
+"Schnitt"
+]
+},
+"spongebob_walking": {
+"stimmung": [
+"witzig"
+],
+"themen": [
+"Film & TV",
+"Meme"
+]
+},
+"poppin_bottles_boosted": {
+"stimmung": [
+"freude"
+],
+"themen": [
+"Musik",
+"Kneipe",
+"Meme"
+]
+},
+"depressed_penguin": {
+"stimmung": [
+"traurig",
+"witzig"
+],
+"themen": [
+"Meme",
+"Tiere"
+]
+},
+"super_idol": {
+"stimmung": [
+"freude",
+"witzig"
+],
+"themen": [
+"Meme",
+"Musik"
+]
+},
+"fortnite_shield_potion": {
+"stimmung": [
+"ruhig",
+"witzig"
+],
+"themen": [
+"Gaming",
+"Meme"
+]
+},
+"don_pollo": {
+"stimmung": [
+"witzig"
+],
+"themen": [
+"Meme",
+"Musik"
+]
+},
+"dark_piano_dexter": {
+"stimmung": [
+"angst",
+"spannung"
+],
+"themen": [
+"Film & TV",
+"Musik"
+]
+},
+"optimus_prime": {
+"stimmung": [
+"episch"
+],
+"themen": [
+"Film & TV",
+"Meme",
+"Ansage"
+]
+},
+"hells_kitchen_suspense": {
+"stimmung": [
+"spannung",
+"angst"
+],
+"themen": [
+"Film & TV",
+"Musik"
+]
+},
+"bone_crack": {
+"stimmung": [
+"schock",
+"wut"
+],
+"themen": [
+"Kampf"
+]
+},
+"magic_spells": {
+"stimmung": [
+"ruhig",
+"episch"
+],
+"themen": [
+"Gaming",
+"Film & TV"
+]
+},
+"laugh_toy_world": {
+"stimmung": [
+"witzig",
+"freude"
+],
+"themen": [
+"Film & TV",
+"Stimme"
+]
+},
+"you_are_my_sunshine": {
+"stimmung": [
+"freude",
+"ruhig"
+],
+"themen": [
+"Musik",
+"Meme"
+]
+},
+"taco_bell": {
+"stimmung": [
+"witzig",
+"schock"
+],
+"themen": [
+"Meme"
+]
+}
+}

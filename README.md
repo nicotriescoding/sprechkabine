@@ -20,4 +20,11 @@ Themen sind Zeilen in `folgen` mit `art = 'thema'` (`info` = Kurzbeschreibung, `
 ## Sounds (seit 2026-11-16)
 
 - Reiter **Sounds**: alle bisher benutzten Soundeffekte mit Namen, Dauer, Folge, Einsatz und Lizenz; Antippen spielt ab, nochmal antippen stoppt. Suchfeld oben. Braucht keinen Schlüssel.
+- **Filter (seit 2026-11-20)**: Suchleiste (Name, Folge, Einsatz, Quelle, Tags), Chips für Stimmung (witzig, schock, angst, freude, traurig, spannung, episch, cringe, wut, ruhig) und Thema (Meme, Film & TV, Gaming, Minecraft, Dating-App, Kampf, Kneipe, Tiere, Ansage, Fail, Technik, Geld, Musik, Schnitt, Alarm, Stimme), mehrere Chips = UND. Sortierung: neueste, kürzeste, längste, A–Z.
+- Tags: `soundeffekte/tags.json` (`id → {stimmung[], themen[]}`) für die Repo-Sounds, bei Sounds aus der Datenbank direkt in deren Spalten.
+- **Neue Sounds automatisch**: Tabelle `sounds` in Supabase (mp3 + Quelle + Tags), Funktion `kabine` Aktionen `soundneu` (Upload, Token nötig), `soundliste`/`soundton` (öffentlich, für die Seite). Hochladen mit `werkzeug/kabine.py sound ...`. Neu hochgeladene erscheinen mit Label „neu“, ohne Deploy/PR.
 - Dateien: `soundeffekte/<id>.mp3` (mono, klein, ca. 1 MB gesamt) und `soundeffekte/sounds.json`, abgeleitet aus Mac `clips/sounds/sounds.json`. Neuer Sound = mp3 + Eintrag in `sounds.json`.
+
+## Claude-Zugang (seit 2026-11-20)
+
+Eigener, widerrufbarer Token nur für Claude (`einstellungen.claude_token`, gleiche Rechte wie Nicos Schlüssel, aber getrennt). Er steht nicht im Repo. `werkzeug/kabine.py` liest ihn selbst (Umgebungsvariable `KABINE_TOKEN`, `.kabine_token` neben dem Skript oder `~/Projects/.kabine_zugang` am Mac), er wird nie als Argument übergeben. Widerrufen: `update einstellungen set wert = <neu> where name = 'claude_token'`.
