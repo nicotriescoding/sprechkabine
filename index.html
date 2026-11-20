@@ -425,6 +425,8 @@ ${esc(notizNext)}</textarea></div>
 // Quellen: soundeffekte/sounds.json + tags.json (Repo) und Tabelle sounds (Funktion kabine, automatisch hochgeladene Sounds).
 let sounds = null, soundFehler = "", soundSuche = "", soundAudio = null, soundLaeuft = null;
 let sFilter = { stimmung: new Set(), thema: new Set() }, sSort = "neu";
+let selbstZeigen = false; try { selbstZeigen = localStorage.getItem("selbstZeigen") === "1"; } catch (e) {}
+const istSelbst = x => /selbst gebaut|selbst erzeugt|generiert/i.test(x.lizenz || "");
 const STIMMUNGEN = ["witzig", "schock", "angst", "freude", "traurig", "spannung", "episch", "cringe", "wut", "ruhig"];
 const THEMEN = ["Meme", "Film & TV", "Gaming", "Minecraft", "Dating-App", "Kampf", "Kneipe", "Tiere", "Ansage", "Fail", "Technik", "Geld", "Musik", "Schnitt", "Alarm", "Stimme"];
 async function soundsLaden() {
@@ -459,14 +461,14 @@ function soundsZeichnen() {
       <div class="chips" aria-label="Stimmung">${STIMMUNGEN.map(w => chip("stimmung", w)).join("")}</div>
       <div class="chips" aria-label="Thema">${THEMEN.map(w => chip("thema", w)).join("")}</div>
       <div class="zeile"><select id="sound-sort" aria-label="Sortieren"><option value="neu">Neueste zuerst</option><option value="kurz">Kürzeste zuerst</option><option value="lang">Längste zuerst</option><option value="az">Name A–Z</option></select>
-      <button class="chip reset" id="sound-reset" hidden>Filter zurücksetzen</button><span id="sound-zahl" class="meta"></span></div></div>
+      <button class="chip" id="sound-selbst"></button><button class="chip reset" id="sound-reset" hidden>Filter zurücksetzen</button><span id="sound-zahl" class="meta"></span></div></div>
       <div id="sound-liste"></div></div>`;
   }
   soundListe();
 }
 function soundListe() {
   const q = soundSuche.trim().toLowerCase(), f = sFilter;
-  let l = sounds.filter(x => (!q || [x.name, x.einsatz, x.lizenz, x.quelle, (x.folgen || []).join(" "), (x.stimmung || []).join(" "), (x.themen || []).join(" ")].join(" ").toLowerCase().includes(q))
+  let l = sounds.filter(x => (selbstZeigen || !istSelbst(x)) && (!q || [x.name, x.einsatz, x.lizenz, x.quelle, (x.folgen || []).join(" "), (x.stimmung || []).join(" "), (x.themen || []).join(" ")].join(" ").toLowerCase().includes(q))
     && [...f.stimmung].every(w => (x.stimmung || []).includes(w)) && [...f.thema].every(w => (x.themen || []).includes(w)));
   const dauer = x => Number(x.dauer_s) || 0;
   l.sort(sSort === "kurz" ? (a, b) => dauer(a) - dauer(b) : sSort === "lang" ? (a, b) => dauer(b) - dauer(a)
@@ -474,8 +476,10 @@ function soundListe() {
   document.querySelectorAll("[data-chip]").forEach(c => c.classList.toggle("an", f[c.dataset.chip].has(c.dataset.wert)));
   const hat = f.stimmung.size + f.thema.size > 0 || q;
   const rs = document.getElementById("sound-reset"); if (rs) rs.hidden = !hat;
-  const zahl = document.getElementById("sound-zahl"); if (zahl) zahl.textContent = `${l.length} von ${sounds.length}`;
-  document.getElementById("oben").textContent = `${sounds.length} Soundeffekte`;
+  const nSelbst = sounds.filter(istSelbst).length, sb = document.getElementById("sound-selbst");
+  if (sb) { sb.textContent = selbstZeigen ? `Selbst gebaute ausblenden (${nSelbst})` : `Selbst gebaute zeigen (${nSelbst})`; sb.classList.toggle("an", selbstZeigen); }
+  const zahl = document.getElementById("sound-zahl"); if (zahl) zahl.textContent = `${l.length} von ${sounds.length - (selbstZeigen ? 0 : nSelbst)}`;
+  document.getElementById("oben").textContent = `${sounds.length - (selbstZeigen ? 0 : sounds.filter(istSelbst).length)} Soundeffekte`;
   document.getElementById("sound-liste").innerHTML = l.map(x => {
     const link = /^https?:/.test(x.quelle || "") ? ` · <a href="${esc(x.quelle)}" target="_blank" rel="noopener">Quelle</a>` : x.quelle ? ` · ${esc(x.quelle)}` : "";
     const warn = /prüfen|Fremdes|CC BY/i.test(x.lizenz || "");
@@ -502,6 +506,7 @@ document.addEventListener("change", e => { if (e.target.id === "sound-sort") { s
 document.addEventListener("click", e => {
   const c = e.target.closest("[data-chip]");
   if (c) { const m = sFilter[c.dataset.chip]; m.has(c.dataset.wert) ? m.delete(c.dataset.wert) : m.add(c.dataset.wert); return soundListe(); }
+  if (e.target.id === "sound-selbst") { selbstZeigen = !selbstZeigen; try { localStorage.setItem("selbstZeigen", selbstZeigen ? "1" : "0"); } catch (x) {} return soundListe(); }
   if (e.target.id === "sound-reset") { sFilter = { stimmung: new Set(), thema: new Set() }; soundSuche = ""; document.getElementById("sound-suche").value = ""; return soundListe(); }
   const b = e.target.closest("[data-sound]"); if (b) soundSpielen(b.dataset.sound);
 });
