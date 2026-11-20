@@ -18,7 +18,10 @@
   "quelle": "https://www.youtube.com/watch?v=TajAzT3CVJc",
   "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern. In der TikTok-App lizenzierte Sounds bevorzugen; hier nur auf Nicos Wunsch eingebaut.; Lizenz auf YouTube nicht angegeben [prüfen]",
   "folgen": [
-   "day10_florida2 (Szene 02 Bildwechsel bei 'swim', original)"
+   "day10_florida2 (Szene 02 Bildwechsel bei 'swim', original)",
+   "claude_broke_my_game",
+   "day12_partypumper",
+   "nature_doku"
   ]
  },
  {
@@ -43,7 +46,10 @@
   "lizenz": "selbst gebaut (werkzeug/sfx_bauen.py bzw. ton_bauen.py), frei nutzbar",
   "folgen": [
    "day2",
-   "day3_florida"
+   "day3_florida",
+   "claude_broke_my_game",
+   "day14_bbq_bar",
+   "nature_doku"
   ]
  },
  {
@@ -199,7 +205,8 @@
   "folgen": [
    "day6",
    "day7_nacktemeile",
-   "day10_florida2"
+   "day10_florida2",
+   "claude_broke_my_game"
   ]
  },
  {
@@ -212,7 +219,8 @@
   "folgen": [
    "day6",
    "day7_nacktemeile",
-   "day10_florida2"
+   "day10_florida2",
+   "claude_broke_my_game"
   ]
  },
  {
@@ -224,7 +232,8 @@
   "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
   "folgen": [
    "day6",
-   "day7_nacktemeile"
+   "day7_nacktemeile",
+   "nature_doku"
   ]
  },
  {
@@ -236,7 +245,8 @@
   "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
   "folgen": [
    "day6",
-   "day7_nacktemeile"
+   "day7_nacktemeile",
+   "nature_doku"
   ]
  },
  {
@@ -310,7 +320,8 @@
   "lizenz": "Mixkit Sound Effects Free License (https://mixkit.co/license/#sfxFree): Social Media und kommerziell erlaubt, keine Namensnennung. Details clips/day6/QUELLEN.txt",
   "folgen": [
    "day6",
-   "day7_nacktemeile"
+   "day7_nacktemeile",
+   "claude_broke_my_game"
   ]
  },
  {
@@ -383,7 +394,8 @@
   "folgen": [
    "day6",
    "day7_nacktemeile",
-   "day10_florida2"
+   "day10_florida2",
+   "claude_broke_my_game"
   ]
  },
  {
@@ -482,7 +494,8 @@
   "quelle": "https://www.youtube.com/watch?v=TajAzT3CVJc",
   "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern. In der TikTok-App lizenzierte Sounds bevorzugen; hier nur auf Nicos Wunsch eingebaut.; Lizenz auf YouTube nicht angegeben [prüfen]",
   "folgen": [
-   "day10_florida2 (Szene 03, Bildwechsel bei 'karate')"
+   "day10_florida2 (Szene 03, Bildwechsel bei 'karate')",
+   "claude_broke_my_game"
   ]
  },
  {
@@ -493,7 +506,8 @@
   "quelle": "https://www.youtube.com/watch?v=TajAzT3CVJc",
   "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern. In der TikTok-App lizenzierte Sounds bevorzugen; hier nur auf Nicos Wunsch eingebaut.; Lizenz auf YouTube nicht angegeben [prüfen]",
   "folgen": [
-   "day10_florida2 (Szene 04, Bildwechsel bei 'runs')"
+   "day10_florida2 (Szene 04, Bildwechsel bei 'runs')",
+   "claude_broke_my_game"
   ]
  },
  {
@@ -526,7 +540,8 @@
   "quelle": "https://www.youtube.com/watch?v=Fiaf796kieI",
   "lizenz": "Fremdes Material, Urheberrecht bei den Rechteinhabern, nur auf Nicos Wunsch eingebaut; Lizenz nicht angegeben [prüfen] (YouTube „Minecraft Eating - Sound Effect (HD)“, Gaming Sound FX)",
   "folgen": [
-   "nature_doku"
+   "nature_doku",
+   "bier_video"
   ]
  },
  {
@@ -708,7 +723,9 @@
   "einsatz": "Rückblende, Übergang in die Vergangenheit",
   "quelle": "https://www.youtube.com/watch?v=SuUvPZDA25o",
   "lizenz": "Fremdes Material, Lizenz auf YouTube prüfen",
-  "folgen": []
+  "folgen": [
+   "day12_partypumper"
+  ]
  },
  {
   "id": "heartbeat",
@@ -717,6 +734,8 @@
   "einsatz": "Spannung, Angst, Showdown-Moment",
   "quelle": "https://www.youtube.com/watch?v=gJpT_wHZeF8",
   "lizenz": "Fremdes Material, Lizenz auf YouTube prüfen",
-  "folgen": []
+  "folgen": [
+   "day12_partypumper"
+  ]
  }
 ]
