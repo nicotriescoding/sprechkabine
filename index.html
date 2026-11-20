@@ -460,7 +460,7 @@ function soundsZeichnen() {
       <input type="search" id="sound-suche" placeholder="Suchen (Name, Folge, Einsatz, Quelle)" aria-label="Sounds suchen">
       <div class="chips" aria-label="Stimmung">${STIMMUNGEN.map(w => chip("stimmung", w)).join("")}</div>
       <div class="chips" aria-label="Thema">${THEMEN.map(w => chip("thema", w)).join("")}</div>
-      <div class="zeile"><select id="sound-sort" aria-label="Sortieren"><option value="neu">Neueste zuerst</option><option value="kurz">Kürzeste zuerst</option><option value="lang">Längste zuerst</option><option value="az">Name A–Z</option></select>
+      <div class="zeile"><select id="sound-sort" aria-label="Sortieren"><option value="neu">Neueste zuerst</option><option value="oft">Am häufigsten benutzt</option><option value="kurz">Kürzeste zuerst</option><option value="lang">Längste zuerst</option><option value="az">Name A–Z</option></select>
       <button class="chip" id="sound-selbst"></button><button class="chip reset" id="sound-reset" hidden>Filter zurücksetzen</button><span id="sound-zahl" class="meta"></span></div></div>
       <div id="sound-liste"></div></div>`;
   }
@@ -471,7 +471,8 @@ function soundListe() {
   let l = sounds.filter(x => (selbstZeigen || !istSelbst(x)) && (!q || [x.name, x.einsatz, x.lizenz, x.quelle, (x.folgen || []).join(" "), (x.stimmung || []).join(" "), (x.themen || []).join(" ")].join(" ").toLowerCase().includes(q))
     && [...f.stimmung].every(w => (x.stimmung || []).includes(w)) && [...f.thema].every(w => (x.themen || []).includes(w)));
   const dauer = x => Number(x.dauer_s) || 0;
-  l.sort(sSort === "kurz" ? (a, b) => dauer(a) - dauer(b) : sSort === "lang" ? (a, b) => dauer(b) - dauer(a)
+  const benutzt = x => (x.folgen || []).length;
+  l.sort(sSort === "oft" ? (a, b) => benutzt(b) - benutzt(a) || b.rang - a.rang : sSort === "kurz" ? (a, b) => dauer(a) - dauer(b) : sSort === "lang" ? (a, b) => dauer(b) - dauer(a)
     : sSort === "az" ? (a, b) => a.name.localeCompare(b.name, "de") : (a, b) => b.rang - a.rang);
   document.querySelectorAll("[data-chip]").forEach(c => c.classList.toggle("an", f[c.dataset.chip].has(c.dataset.wert)));
   const hat = f.stimmung.size + f.thema.size > 0 || q;
@@ -485,7 +486,7 @@ function soundListe() {
     const warn = /prüfen|Fremdes|CC BY/i.test(x.lizenz || "");
     const tags = [...(x.stimmung || []), ...(x.themen || [])].map(t => `<span class="tag">${esc(t)}</span>`).join("");
     return `<button class="sound${soundLaeuft === x.id ? " spielt" : ""}" data-sound="${esc(x.id)}"><span class="play">${soundLaeuft === x.id ? "■" : "▶"}</span>
-      <span><span class="name">${esc(x.name)}${x.neu ? ' <span class="tag neu">neu</span>' : ""}</span><br><span class="meta">${dauer(x)} s${(x.folgen || []).length ? " · " + esc(x.folgen.join(", ")) : ""}${x.einsatz ? "<br>" + esc(x.einsatz) : ""}</span>
+      <span><span class="name">${esc(x.name)}${x.neu ? ' <span class="tag neu">neu</span>' : ""}</span><br><span class="meta">${dauer(x)} s${benutzt(x) ? ` · ${benutzt(x)}× benutzt: ` + esc(x.folgen.join(", ")) : ""}${x.einsatz ? "<br>" + esc(x.einsatz) : ""}</span>
       <br>${tags}<br><span class="meta"><span class="${warn ? "warn" : ""}">${esc(x.lizenz || "")}</span>${link}</span></span></button>`;
   }).join("") || `<p class="box">Nichts gefunden.</p>`;
 }
