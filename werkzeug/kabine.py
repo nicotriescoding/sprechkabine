@@ -67,6 +67,8 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     t = sub.add_parser("ton"); t.add_argument("folge"); t.add_argument("satz"); t.add_argument("ziel")
     sub.add_parser("liste")
+    fl = sub.add_parser("flag", help="Sound als Favorit markieren / aussortieren")
+    fl.add_argument("id"); fl.add_argument("--favorit", choices=["0", "1"]); fl.add_argument("--aus", choices=["0", "1"])
     for n in ("sound", "sound-tags"):
         s = sub.add_parser(n)
         s.add_argument("datei" if n == "sound" else "id")
@@ -80,6 +82,11 @@ def main():
         open(a.ziel, "wb").write(call("ton", {"folge": a.folge, "satz": a.satz})); print("ok", a.ziel)
     elif a.cmd == "liste":
         print(json.dumps(json.loads(call("liste", {})), ensure_ascii=False, indent=1))
+    elif a.cmd == "flag":
+        p = {"id": a.id}
+        if a.favorit is not None: p["favorit"] = a.favorit
+        if a.aus is not None: p["ausgeblendet"] = a.aus
+        print(call("soundflag", p, b"", "POST").decode())
     elif a.cmd == "sound":
         mp3, dauer = zu_mp3(a.datei)
         if a.sql:
