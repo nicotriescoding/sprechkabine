@@ -125,6 +125,12 @@
   .chip.reset { border-style: dashed; }
   .tag { display: inline-block; font-size: 12px; padding: 2px 8px; margin: 4px 4px 0 0; border-radius: 999px; background: var(--kante); color: var(--kreide); }
   .tag.neu { background: var(--hopfen); color: var(--holz); }
+  .sound-zeile { display: flex; flex-direction: column; }
+  .sound-aktion { display: flex; gap: 8px; align-items: center; padding: 0 4px 8px; }
+  .sound-aktion .chip { min-height: 36px; padding: 4px 12px; }
+  .sound-aktion label { font-size: 14px; color: var(--staub); display: flex; gap: 8px; align-items: center; min-height: 36px; cursor: pointer; }
+  .sound-aktion input { width: 22px; height: 22px; }
+  .chip.fav.an { background: #f5c518; border-color: #f5c518; color: #222; }
   @keyframes puls { 50% { opacity: .55; } }
 </style>
 </head>
@@ -426,7 +432,24 @@ ${esc(notizNext)}</textarea></div>
 let sounds = null, soundFehler = "", soundSuche = "", soundAudio = null, soundLaeuft = null;
 let sFilter = { stimmung: new Set(), thema: new Set() }, sSort = "neu";
 let selbstZeigen = false; try { selbstZeigen = localStorage.getItem("selbstZeigen") === "1"; } catch (e) {}
+let sFlags = {}, nurFav = false;
+try { sFlags = JSON.parse(localStorage.getItem("soundFlags") || "{}"); } catch (e) {}
 const istSelbst = x => /selbst gebaut|selbst erzeugt|generiert/i.test(x.lizenz || "");
+// Haken gesetzt = aussortiert; ohne eigenen Haken gelten selbst gebaute Sounds als aussortiert
+const istAus = x => { const f = sFlags[x.id]; return f && f.ausgeblendet != null ? !!f.ausgeblendet : istSelbst(x); };
+const istFav = x => !!(sFlags[x.id] && sFlags[x.id].favorit);
+async function flagSetzen(id, teil) {
+  sFlags[id] = { ...(sFlags[id] || {}), ...teil };
+  try { localStorage.setItem("soundFlags", JSON.stringify(sFlags)); } catch (e) {}
+  soundListe();
+  if (!K) { soundHinweis("Ohne Schlüssel nur in diesem Browser gespeichert."); return; }
+  const p = new URLSearchParams({ k: K, aktion: "soundflag", id });
+  if ("ausgeblendet" in teil) p.set("ausgeblendet", teil.ausgeblendet ? "1" : "0");
+  if ("favorit" in teil) p.set("favorit", teil.favorit ? "1" : "0");
+  try { const r = await fetch(`${API}?${p}`, { method: "POST" }); if (!r.ok) throw new Error(r.status); }
+  catch (e) { soundHinweis("Speichern in der Datenbank fehlgeschlagen (" + e.message + "), nur lokal gemerkt."); }
+}
+function soundHinweis(t) { const z = document.getElementById("sound-zahl"); if (z) z.textContent = t; }
 const STIMMUNGEN = ["witzig", "schock", "angst", "freude", "traurig", "spannung", "episch", "cringe", "wut", "ruhig"];
 const THEMEN = ["Meme", "Film & TV", "Gaming", "Minecraft", "Dating-App", "Kampf", "Kneipe", "Tiere", "Ansage", "Fail", "Technik", "Geld", "Musik", "Schnitt", "Alarm", "Stimme"];
 async function soundsLaden() {
@@ -434,6 +457,7 @@ async function soundsLaden() {
     const [r, t, d] = await Promise.all([
       fetch("soundeffekte/sounds.json"), fetch("soundeffekte/tags.json").catch(() => null),
       fetch(`${API}?aktion=soundliste`).catch(() => null)]);
+    try { const fr = await fetch(`${API}?aktion=soundflags`); if (fr.ok) { const fl = await fr.json(); if (fl.length) { sFlags = {}; fl.forEach(f => sFlags[f.id] = { ausgeblendet: f.ausgeblendet, favorit: f.favorit }); try { localStorage.setItem("soundFlags", JSON.stringify(sFlags)); } catch (e) {} } } } catch (e) {}
     if (!r.ok) throw new Error(r.status);
     const stat = await r.json(), tags = t && t.ok ? await t.json() : {};
     stat.forEach((x, i) => { Object.assign(x, tags[x.id] || {}); x.rang = i; x.quelleUrl = `soundeffekte/${encodeURIComponent(x.id)}.mp3`; });
@@ -457,6 +481,7 @@ function soundsZeichnen() {
   if (!el.querySelector("input")) {
     const chip = (art, w) => `<button class="chip" data-chip="${art}" data-wert="${esc(w)}">${esc(w)}</button>`;
     el.innerHTML = `<div class="sounds-zone"><div class="filterleiste">
+      <div class="zeile"><button class="chip fav" id="sound-fav"></button></div>
       <input type="search" id="sound-suche" placeholder="Suchen (Name, Folge, Einsatz, Quelle)" aria-label="Sounds suchen">
       <div class="chips" aria-label="Stimmung">${STIMMUNGEN.map(w => chip("stimmung", w)).join("")}</div>
       <div class="chips" aria-label="Thema">${THEMEN.map(w => chip("thema", w)).join("")}</div>
@@ -468,26 +493,30 @@ function soundsZeichnen() {
 }
 function soundListe() {
   const q = soundSuche.trim().toLowerCase(), f = sFilter;
-  let l = sounds.filter(x => (selbstZeigen || !istSelbst(x)) && (!q || [x.name, x.einsatz, x.lizenz, x.quelle, (x.folgen || []).join(" "), (x.stimmung || []).join(" "), (x.themen || []).join(" ")].join(" ").toLowerCase().includes(q))
+  let l = sounds.filter(x => (selbstZeigen || !istAus(x)) && (!nurFav || istFav(x)) && (!q || [x.name, x.einsatz, x.lizenz, x.quelle, (x.folgen || []).join(" "), (x.stimmung || []).join(" "), (x.themen || []).join(" ")].join(" ").toLowerCase().includes(q))
     && [...f.stimmung].every(w => (x.stimmung || []).includes(w)) && [...f.thema].every(w => (x.themen || []).includes(w)));
   const dauer = x => Number(x.dauer_s) || 0;
   const benutzt = x => (x.folgen || []).length;
   l.sort(sSort === "oft" ? (a, b) => benutzt(b) - benutzt(a) || b.rang - a.rang : sSort === "kurz" ? (a, b) => dauer(a) - dauer(b) : sSort === "lang" ? (a, b) => dauer(b) - dauer(a)
     : sSort === "az" ? (a, b) => a.name.localeCompare(b.name, "de") : (a, b) => b.rang - a.rang);
   document.querySelectorAll("[data-chip]").forEach(c => c.classList.toggle("an", f[c.dataset.chip].has(c.dataset.wert)));
-  const hat = f.stimmung.size + f.thema.size > 0 || q;
+  const hat = f.stimmung.size + f.thema.size > 0 || q || nurFav;
+  const nFav = sounds.filter(istFav).length, fb = document.getElementById("sound-fav");
+  if (fb) { fb.textContent = `⭐ Favoriten (${nFav})`; fb.classList.toggle("an", nurFav); }
   const rs = document.getElementById("sound-reset"); if (rs) rs.hidden = !hat;
-  const nSelbst = sounds.filter(istSelbst).length, sb = document.getElementById("sound-selbst");
-  if (sb) { sb.textContent = selbstZeigen ? `Selbst gebaute ausblenden (${nSelbst})` : `Selbst gebaute zeigen (${nSelbst})`; sb.classList.toggle("an", selbstZeigen); }
+  const nSelbst = sounds.filter(istAus).length, sb = document.getElementById("sound-selbst");
+  if (sb) { sb.textContent = selbstZeigen ? `Aussortierte ausblenden (${nSelbst})` : `Aussortierte zeigen (${nSelbst})`; sb.classList.toggle("an", selbstZeigen); }
   const zahl = document.getElementById("sound-zahl"); if (zahl) zahl.textContent = `${l.length} von ${sounds.length - (selbstZeigen ? 0 : nSelbst)}`;
-  document.getElementById("oben").textContent = `${sounds.length - (selbstZeigen ? 0 : sounds.filter(istSelbst).length)} Soundeffekte`;
+  document.getElementById("oben").textContent = `${sounds.length - (selbstZeigen ? 0 : nSelbst)} Soundeffekte`;
   document.getElementById("sound-liste").innerHTML = l.map(x => {
     const link = /^https?:/.test(x.quelle || "") ? ` · <a href="${esc(x.quelle)}" target="_blank" rel="noopener">Quelle</a>` : x.quelle ? ` · ${esc(x.quelle)}` : "";
     const warn = /prüfen|Fremdes|CC BY/i.test(x.lizenz || "");
     const tags = [...(x.stimmung || []), ...(x.themen || [])].map(t => `<span class="tag">${esc(t)}</span>`).join("");
-    return `<button class="sound${soundLaeuft === x.id ? " spielt" : ""}" data-sound="${esc(x.id)}"><span class="play">${soundLaeuft === x.id ? "■" : "▶"}</span>
+    return `<div class="sound-zeile"><button class="sound${soundLaeuft === x.id ? " spielt" : ""}" data-sound="${esc(x.id)}"><span class="play">${soundLaeuft === x.id ? "■" : "▶"}</span>
       <span><span class="name">${esc(x.name)}${x.neu ? ' <span class="tag neu">neu</span>' : ""}</span><br><span class="meta">${dauer(x)} s${benutzt(x) ? ` · ${benutzt(x)}× benutzt: ` + esc(x.folgen.join(", ")) : ""}${x.einsatz ? "<br>" + esc(x.einsatz) : ""}</span>
-      <br>${tags}<br><span class="meta"><span class="${warn ? "warn" : ""}">${esc(x.lizenz || "")}</span>${link}</span></span></button>`;
+      <br>${tags}<br><span class="meta"><span class="${warn ? "warn" : ""}">${esc(x.lizenz || "")}</span>${link}</span></span></button>
+      <div class="sound-aktion"><button class="chip fav${istFav(x) ? " an" : ""}" data-fav="${esc(x.id)}" aria-label="Favorit">${istFav(x) ? "⭐ Favorit" : "☆ Favorit"}</button>
+      <label><input type="checkbox" data-aus="${esc(x.id)}"${istAus(x) ? " checked" : ""}> aussortiert</label></div></div>`;
   }).join("") || `<p class="box">Nichts gefunden.</p>`;
 }
 function soundSpielen(id) {
@@ -503,12 +532,14 @@ function soundSpielen(id) {
   soundListe();
 }
 document.addEventListener("input", e => { if (e.target.id === "sound-suche") { soundSuche = e.target.value; soundListe(); } });
-document.addEventListener("change", e => { if (e.target.id === "sound-sort") { sSort = e.target.value; soundListe(); } });
+document.addEventListener("change", e => { if (e.target.dataset && e.target.dataset.aus) return flagSetzen(e.target.dataset.aus, { ausgeblendet: e.target.checked }); if (e.target.id === "sound-sort") { sSort = e.target.value; soundListe(); } });
 document.addEventListener("click", e => {
   const c = e.target.closest("[data-chip]");
   if (c) { const m = sFilter[c.dataset.chip]; m.has(c.dataset.wert) ? m.delete(c.dataset.wert) : m.add(c.dataset.wert); return soundListe(); }
   if (e.target.id === "sound-selbst") { selbstZeigen = !selbstZeigen; try { localStorage.setItem("selbstZeigen", selbstZeigen ? "1" : "0"); } catch (x) {} return soundListe(); }
-  if (e.target.id === "sound-reset") { sFilter = { stimmung: new Set(), thema: new Set() }; soundSuche = ""; document.getElementById("sound-suche").value = ""; return soundListe(); }
+  if (e.target.id === "sound-fav") { nurFav = !nurFav; return soundListe(); }
+  const fv = e.target.closest("[data-fav]"); if (fv) return flagSetzen(fv.dataset.fav, { favorit: !istFav({ id: fv.dataset.fav }) });
+  if (e.target.id === "sound-reset") { nurFav = false; sFilter = { stimmung: new Set(), thema: new Set() }; soundSuche = ""; document.getElementById("sound-suche").value = ""; return soundListe(); }
   const b = e.target.closest("[data-sound]"); if (b) soundSpielen(b.dataset.sound);
 });
 

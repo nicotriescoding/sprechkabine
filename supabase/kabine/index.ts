@@ -39,6 +39,10 @@ Deno.serve(async (req) => {
     if (r.error) return json({ fehler: r.error.message }, 500);
     return json(r.data);
   }
+  if (req.method === "GET" && aktion === "soundflags") {
+    const r = await sb.from("sound_flags").select("id, ausgeblendet, favorit");
+    return json(r.error ? [] : r.data);
+  }
   if (req.method === "GET" && aktion === "soundton") {
     const { data, error } = await sb.from("sounds").select("daten").eq("id", url.searchParams.get("id") ?? "").single();
     if (error || !data?.daten) return json({ fehler: "Kein Sound" }, 404);
@@ -62,6 +66,18 @@ Deno.serve(async (req) => {
     if (body.length > 0) row.daten = "\\x" + Array.from(body, (b) => b.toString(16).padStart(2, "0")).join("");
     if (!row.name && body.length > 0) row.name = id;
     const r = await sb.from("sounds").upsert(row);
+    if (r.error) return json({ fehler: r.error.message }, 500);
+    return json({ ok: true, id });
+  }
+
+  if (req.method === "POST" && aktion === "soundflag") {
+    // Haken (aussortiert) und Stern (Favorit) pro Sound; nur die mitgeschickten Felder ändern sich.
+    const q = url.searchParams, id = q.get("id") ?? "";
+    if (!/^[\w-]{2,60}$/.test(id)) return json({ fehler: "Ungültige id" }, 400);
+    const row: Record<string, unknown> = { id, at: new Date().toISOString() };
+    if (q.has("ausgeblendet")) row.ausgeblendet = q.get("ausgeblendet") === "null" ? null : q.get("ausgeblendet") === "1";
+    if (q.has("favorit")) row.favorit = q.get("favorit") === "1";
+    const r = await sb.from("sound_flags").upsert(row);
     if (r.error) return json({ fehler: r.error.message }, 500);
     return json({ ok: true, id });
   }
